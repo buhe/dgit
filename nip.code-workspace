@@ -8,6 +8,9 @@
 		},
 		{
 			"path": "git-remote-ipfs"
+		},
+		{
+			"path": "."
 		}
 	],
 	"settings": {}
