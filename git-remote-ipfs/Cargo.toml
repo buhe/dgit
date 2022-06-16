@@ -1,5 +1,5 @@
 [package]
-name = "git-remte-ipfs"
+name = "git-remote-ipfs"
 version = "0.1.0"
 edition = "2021"
 

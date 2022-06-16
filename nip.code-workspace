@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "../nip"
+		},
+		{
+			"path": "../nip_core"
+		},
+		{
+			"path": "git-remote-ipfs"
+		}
+	],
+	"settings": {}
+}
