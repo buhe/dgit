@@ -1,7 +1,11 @@
-use std::{ io::{self, BufRead, BufReader, Write}, process};
+use std::{ io::{self, BufRead, BufReader, Write}, process, env};
+
+use env_logger::Builder;
+use log::{LevelFilter, trace};
 
 fn main() -> std::io::Result<()> {
-    // println!("Hello, world!");
+    init_logging(LevelFilter::Trace);
+    trace!("Hello, world!");
     let mut input_handle = BufReader::new(io::stdin());
     let mut output_handle = io::stdout();
 
@@ -59,4 +63,11 @@ fn handle_list(
 
     
     Ok(())
+}
+
+pub fn init_logging(default_lvl: LevelFilter) {
+    match env::var("RUST_LOG") {
+        Ok(_) => env_logger::init(),
+        Err(_) => Builder::new().filter_level(default_lvl).init(),
+    }
 }
