@@ -10,8 +10,10 @@
 			"path": "git-remote-ipfs"
 		},
 		{
-			"path": "."
+			"path": "../git-u"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"makefile.extensionOutputFolder": "./.vscode"
+	}
 }
