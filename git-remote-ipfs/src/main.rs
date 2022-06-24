@@ -6,7 +6,6 @@ use log::{LevelFilter, trace};
 use crate::wallet_connect::connect;
 
 mod wallet_connect;
-mod test_url;
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
