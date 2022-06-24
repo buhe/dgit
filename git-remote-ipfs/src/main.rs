@@ -1,7 +1,7 @@
 use std::{ io::{self, BufRead, BufReader, Write}, process, env};
 
 use env_logger::Builder;
-use log::{LevelFilter, trace};
+use log::{LevelFilter, trace, info};
 
 use crate::wallet_connect::connect;
 
@@ -14,9 +14,11 @@ async fn main() -> std::io::Result<()> {
     let mut input_handle = BufReader::new(io::stdin());
     let mut output_handle = io::stdout();
 
-    handle_capabilities(&mut input_handle, &mut output_handle).unwrap();
-    handle_list(&mut input_handle, &mut output_handle).unwrap();
-    connect().await.unwrap();
+    handle_capabilities(&mut input_handle, &mut output_handle)?;
+    handle_list(&mut input_handle, &mut output_handle)?;
+    // connect().await.unwrap();
+
+    handle_fetches_and_pushes(&mut input_handle, &mut output_handle)?;
     // Ok(for line in input_handle.lines() {
     //     let line_buf = line?;
     //     match line_buf.as_str() {
@@ -70,6 +72,15 @@ fn handle_list(
     
     Ok(())
 }
+
+fn handle_fetches_and_pushes(
+    input_handle: &mut dyn BufRead,
+    _output_handle: &mut dyn Write) -> std::io::Result<()> {
+        for line in input_handle.lines() {
+            info!("{:#?}", line);
+        }
+        Ok(())
+    }
 
 pub fn init_logging(default_lvl: LevelFilter) {
     match env::var("RUST_LOG") {
