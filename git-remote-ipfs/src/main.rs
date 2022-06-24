@@ -3,7 +3,13 @@ use std::{ io::{self, BufRead, BufReader, Write}, process, env};
 use env_logger::Builder;
 use log::{LevelFilter, trace};
 
-fn main() -> std::io::Result<()> {
+use crate::wallet_connect::connect;
+
+mod wallet_connect;
+mod test_url;
+
+#[tokio::main]
+async fn main() -> std::io::Result<()> {
     init_logging(LevelFilter::Trace);
     trace!("Hello, world!");
     let mut input_handle = BufReader::new(io::stdin());
@@ -11,6 +17,7 @@ fn main() -> std::io::Result<()> {
 
     handle_capabilities(&mut input_handle, &mut output_handle).unwrap();
     handle_list(&mut input_handle, &mut output_handle).unwrap();
+    connect().await.unwrap();
     // Ok(for line in input_handle.lines() {
     //     let line_buf = line?;
     //     match line_buf.as_str() {
