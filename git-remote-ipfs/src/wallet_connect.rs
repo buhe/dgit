@@ -3,8 +3,6 @@ use std::error::Error;
 use log::info;
 // use walletconnect::transport::WalletConnect;
 use walletconnect::{qr, Client, Metadata};
-
-use crate::test_url;
 // use web3::types::TransactionRequest;
 // use web3::Web3;
 
@@ -22,7 +20,7 @@ pub async fn connect() -> Result<(), Box<dyn Error>> {
         },
     )?;
 
-    let (accounts, _) = client.ensure_session(test_url::print_with_url).await?;
+    let (accounts, _) = client.ensure_session(qr::print_with_url).await?;
 
     info!("Connected accounts:");
     for account in &accounts {
@@ -39,7 +37,7 @@ pub async fn connect() -> Result<(), Box<dyn Error>> {
     //     })
     //     .await?;
 
-    println!("Transaction sent:\n  https://ropsten.etherscan.io/address/{}", accounts[0]);
+    info!("Transaction sent:\n  https://ropsten.etherscan.io/address/{}", accounts[0]);
     // println!("Transaction sent:\n  https://etherscan.io/tx/{:?}", tx);
 
     Ok(())
