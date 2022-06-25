@@ -3,6 +3,7 @@ import Web3 from 'web3';
 
 function App() {
   const [account, setAccount] = useState(); // state variable to set account.
+  const [call, setCall] = useState(); // state variable to set account.
 
   useEffect(() => {
     async function load() {
@@ -18,6 +19,7 @@ function App() {
   return (
     <div>
       Your account is: {account}
+      Call: {call}
     </div>
   );
 }
