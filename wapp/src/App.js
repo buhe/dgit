@@ -6,7 +6,7 @@ function App() {
 
   useEffect(() => {
     async function load() {
-      const web3 = new Web3(Web3.givenProvider || 'http://localhost:7545');
+      const web3 = new Web3(Web3.givenProvider || 'https://ropsten.infura.io/v3/3f433221d3db475db058b3875a617fdd');
       const accounts = await web3.eth.requestAccounts();
 
       setAccount(accounts[0]);
