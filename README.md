@@ -1,11 +1,17 @@
 ## dgit
 Git powered by dapp
 
+### Dev
 ```
 npx hardhat node
 npx hardhat run scripts/sample-script.js --network localhost
 ```
+### Test network
+```
+npx hardhat run scripts/sample-script.js --network ropsten
 
+Greeter deployed to: 0x22fCB380773027B246b0EAfafC1f996938f2eF14
+```
 ### VSC Plugin
 名称: Solidity + Hardhat
 
@@ -19,8 +25,3 @@ ID: NomicFoundation.hardhat-solidity
 
 VS Marketplace 链接: https://marketplace.visualstudio.com/items?itemName=NomicFoundation.hardhat-solidity
 
-```
-npx hardhat run scripts/sample-script.js --network ropsten
-
-Greeter deployed to: 0x22fCB380773027B246b0EAfafC1f996938f2eF14
-```
