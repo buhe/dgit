@@ -22,5 +22,5 @@ VS Marketplace 链接: https://marketplace.visualstudio.com/items?itemName=Nomic
 ```
 npx hardhat run scripts/sample-script.js --network ropsten
 
-0x1e66dc7466dd2b513f4eBf4DbeD49E5efB971CdF
+Greeter deployed to: 0x22fCB380773027B246b0EAfafC1f996938f2eF14
 ```

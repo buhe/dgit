@@ -1,6 +1,45 @@
 import { useEffect, useState } from 'react';
 import Web3 from 'web3';
-
+const ABI = [
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_greeting",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "inputs": [],
+    "name": "greet",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_greeting",
+        "type": "string"
+      }
+    ],
+    "name": "setGreeting",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+];
+const ADDRESS = '0x22fCB380773027B246b0EAfafC1f996938f2eF14';
 function App() {
   const [account, setAccount] = useState(); // state variable to set account.
   const [call, setCall] = useState(); // state variable to set account.
@@ -11,6 +50,14 @@ function App() {
       const accounts = await web3.eth.requestAccounts();
 
       setAccount(accounts[0]);
+
+
+      // Instantiate smart contract using ABI and address.
+      const contactList = new web3.eth.Contract(ABI, ADDRESS);
+      await contactList.methods.setGreeting('hi').call();
+      const greet = await contactList.methods.greet().call();
+      console.log(greet);
+      setCall(greet);
     }
 
     load();
@@ -19,7 +66,7 @@ function App() {
   return (
     <div>
       Your account is: {account}
-      Call: {call}
+      Call: {JSON.stringify(call)}
     </div>
   );
 }
