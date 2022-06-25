@@ -11,6 +11,12 @@
 		},
 		{
 			"path": "../git-u"
+		},
+		{
+			"path": "wapp"
+		},
+		{
+			"path": "dapp"
 		}
 	],
 	"settings": {
