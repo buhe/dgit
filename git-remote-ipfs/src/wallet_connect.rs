@@ -1,10 +1,10 @@
 // use std::env;
 use std::error::Error;
 use log::info;
-// use walletconnect::transport::WalletConnect;
+use walletconnect::transport::WalletConnect;
 use walletconnect::{qr, Client, Metadata};
-// use web3::types::TransactionRequest;
-// use web3::Web3;
+use web3::types::TransactionRequest;
+use web3::Web3;
 
 
 pub async fn connect() -> Result<(), Box<dyn Error>> {
@@ -20,25 +20,30 @@ pub async fn connect() -> Result<(), Box<dyn Error>> {
         },
     )?;
 
-    let (accounts, _) = client.ensure_session(qr::print_with_url).await?;
 
-    info!("Connected accounts:");
+    client.ensure_session(qr::print_with_url).await?;
+
+    let wc = WalletConnect::new(client, "3f433221d3db475db058b3875a617fdd")?;
+    let web3 = Web3::new(wc);
+
+    let accounts = web3.eth().accounts().await?;
+    println!("Connected accounts:");
     for account in &accounts {
         info!(" - {:?}", account);
     }
 
-    // let tx = web3
-    //     .eth()
-    //     .send_transaction(TransactionRequest {
-    //         from: accounts[0],
-    //         to: Some("000102030405060708090a0b0c0d0e0f10111213".parse()?),
-    //         value: Some(1_000_000_000_000_000u128.into()),
-    //         ..TransactionRequest::default()
-    //     })
-    //     .await?;
+    let tx = web3
+        .eth()
+        .send_transaction(TransactionRequest {
+            from: accounts[0],
+            to: Some("000102030405060708090a0b0c0d0e0f10111213".parse()?),
+            value: Some(1_000_000_000_000_000u128.into()),
+            ..TransactionRequest::default()
+        })
+        .await?;
 
     info!("Transaction sent:\n  https://ropsten.etherscan.io/address/{}", accounts[0]);
-    // println!("Transaction sent:\n  https://etherscan.io/tx/{:?}", tx);
+    info!("Transaction sent:\n  https://etherscan.io/tx/{:?}", tx);
 
     Ok(())
 }

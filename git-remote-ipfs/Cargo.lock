@@ -824,6 +824,7 @@ dependencies = [
  "log",
  "tokio",
  "walletconnect",
+ "web3",
 ]
 
 [[package]]

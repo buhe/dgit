@@ -12,3 +12,4 @@ walletconnect = { git = "https://github.com/buhe/walletconnect-rs", features = [
 git2 = "0.13"
 tokio = { version = "1", features = ["full"] }
 ipfs-api-backend-hyper = "0.4"
+web3 = "0.18.0"

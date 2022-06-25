@@ -16,7 +16,7 @@ async fn main() -> std::io::Result<()> {
 
     handle_capabilities(&mut input_handle, &mut output_handle)?;
     handle_list(&mut input_handle, &mut output_handle)?;
-    // connect().await.unwrap();
+    connect().await.unwrap();
 
     handle_fetches_and_pushes(&mut input_handle, &mut output_handle)?;
     // Ok(for line in input_handle.lines() {
