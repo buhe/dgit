@@ -10,13 +10,14 @@ mod wallet_connect;
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
     init_logging(LevelFilter::Trace);
-    trace!("Hello, world!");
+    let mut args = env::args();
+    trace!("Hello, world! {} {} {}", args.next().unwrap(), args.next().unwrap(), args.next().unwrap());
     let mut input_handle = BufReader::new(io::stdin());
     let mut output_handle = io::stdout();
 
     handle_capabilities(&mut input_handle, &mut output_handle)?;
     handle_list(&mut input_handle, &mut output_handle)?;
-    connect().await.unwrap();
+    // connect().await.unwrap();
 
     handle_fetches_and_pushes(&mut input_handle, &mut output_handle)?;
     // Ok(for line in input_handle.lines() {
@@ -77,10 +78,10 @@ fn handle_fetches_and_pushes(
     input_handle: &mut dyn BufRead,
     _output_handle: &mut dyn Write) -> std::io::Result<()> {
         for line in input_handle.lines() {
-            info!("{:#?}", line);
+            info!("push {}", line.unwrap());
         }
         Ok(())
-    }
+}
 
 pub fn init_logging(default_lvl: LevelFilter) {
     match env::var("RUST_LOG") {
