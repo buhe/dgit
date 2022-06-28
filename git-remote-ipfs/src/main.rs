@@ -1,9 +1,9 @@
 use std::{ io::{self, BufRead, BufReader, Write}, process, env};
 
 use env_logger::Builder;
-use log::{LevelFilter, trace, info, error};
+use log::{LevelFilter, trace, info, error, debug};
 
-use crate::{wallet_connect::connect, ref_parse::Ref};
+use crate::{wallet_connect::connect, ref_parse::Ref, repo::Repo};
 
 mod wallet_connect;
 mod repo;
@@ -92,6 +92,10 @@ fn handle_fetches_and_pushes(
                 trace!("Raw push line {:?}", push_line);
                 // Tell git we're done with this ref
                 let r: Ref = push_line.parse().unwrap();
+                let mut repo = Repo::default();
+                repo.find_all_objects(r.src);
+
+                debug!("repo:{:#?}", &repo);
                 writeln!(output_handle, "ok {}", r.dst)?;
             }
             // The lines() iterator clips the newline by default, so the last line match is ""
