@@ -1,6 +1,6 @@
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashSet};
 
-use git2::{Repository, Error, ObjectType};
+use git2::{Repository, Error, ObjectType, Object, Oid};
 use ipfs_api_backend_hyper::IpfsClient;
 use log::debug;
 
@@ -11,8 +11,13 @@ pub struct Repo {
 }
 
 impl Repo {
-    pub fn find_all_objects(&mut self, top: String){
+    pub fn find_all_objects   (&self,
+        obj: &Object,
+        push_todo: &mut HashSet<Oid>,
+        repo: &Repository,
+    ) -> Result<(), Error> {
 
+        Ok(())
     }
 
     pub fn push(&mut self,
@@ -37,6 +42,8 @@ impl Repo {
             obj.id()
         );
 
+        let mut objs_for_push = HashSet::new();
+        self.find_all_objects(&obj.clone(), &mut objs_for_push, repo)?;
         Ok(())
     }
 }
