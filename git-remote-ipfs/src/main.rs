@@ -1,11 +1,13 @@
 use std::{ io::{self, BufRead, BufReader, Write}, process, env};
 
 use env_logger::Builder;
-use log::{LevelFilter, trace, info};
+use log::{LevelFilter, trace, info, error};
 
 use crate::wallet_connect::connect;
 
 mod wallet_connect;
+mod repo;
+mod object;
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
@@ -76,11 +78,39 @@ fn handle_list(
 
 fn handle_fetches_and_pushes(
     input_handle: &mut dyn BufRead,
-    _output_handle: &mut dyn Write) -> std::io::Result<()> {
-        for line in input_handle.lines() {
-            info!("push {}", line.unwrap());
+    output_handle: &mut dyn Write) -> std::io::Result<()> {
+         for line in input_handle.lines() {
+        let line_buf = line?;
+        match line_buf.as_str() {
+            // fetch <sha> <ref_name>
+            fetch_line if fetch_line.starts_with("fetch") => {
+                trace!("Raw fetch line {:?}", fetch_line);
+            }
+            // push <refspec>
+            push_line if push_line.starts_with("push") => {
+                trace!("Raw push line {:?}", push_line);
+                // Tell git we're done with this ref
+                // writeln!(output_handle, "ok {}", dst)?;
+            }
+            // The lines() iterator clips the newline by default, so the last line match is ""
+            "" => {
+                trace!("Consumed all fetch/push commands");
+                break;
+            }
+            other => {
+                let msg = format!(
+                    "Git unexpectedly said {:?} during push/fetch parsing.",
+                    other
+                );
+                error!("{}", msg);
+            }
         }
-        Ok(())
+    }
+
+    // Upload current_idx to IPFS if it differs from the original idx
+    // Tell git that we're done
+    writeln!(output_handle)?;
+    Ok(())
 }
 
 pub fn init_logging(default_lvl: LevelFilter) {
