@@ -1,6 +1,7 @@
 use std::{ io::{self, BufRead, BufReader, Write}, process, env};
 
 use env_logger::Builder;
+use git2::Repository;
 use log::{LevelFilter, trace, info, error, debug};
 
 use crate::{wallet_connect::connect, ref_parse::Ref, repo::Repo};
@@ -93,10 +94,11 @@ fn handle_fetches_and_pushes(
                 // Tell git we're done with this ref
                 let r: Ref = push_line.parse().unwrap();
                 let mut repo = Repo::default();
-                repo.find_all_objects(r.src);
+                let mut git_repo = Repository::open_from_env().unwrap();
+                repo.push(&r.src, &r.dst, r.force, &mut git_repo).unwrap();
 
                 debug!("repo:{:#?}", &repo);
-                writeln!(output_handle, "ok {}", r.dst)?;
+                writeln!(output_handle, "ok {}", &r.dst)?;
             }
             // The lines() iterator clips the newline by default, so the last line match is ""
             "" => {

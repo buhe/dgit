@@ -5,6 +5,7 @@ use log::{warn, debug};
 pub struct Ref {
     pub src: String,
     pub dst: String,
+    pub force: bool,
 }
 
 impl FromStr for Ref {
@@ -36,6 +37,6 @@ impl FromStr for Ref {
         }).unwrap();
         debug!("Parsed dst: {}", dst);
 
-        Ok(Ref {src: src.to_string(),dst: dst.to_string()})
+        Ok(Ref {src: src.to_string(),dst: dst.to_string(), force})
     }
 }
