@@ -3,11 +3,12 @@ use std::{ io::{self, BufRead, BufReader, Write}, process, env};
 use env_logger::Builder;
 use log::{LevelFilter, trace, info, error};
 
-use crate::wallet_connect::connect;
+use crate::{wallet_connect::connect, ref_parse::Ref};
 
 mod wallet_connect;
 mod repo;
 mod object;
+mod ref_parse;
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
@@ -90,7 +91,8 @@ fn handle_fetches_and_pushes(
             push_line if push_line.starts_with("push") => {
                 trace!("Raw push line {:?}", push_line);
                 // Tell git we're done with this ref
-                // writeln!(output_handle, "ok {}", dst)?;
+                let r: Ref = push_line.parse().unwrap();
+                writeln!(output_handle, "ok {}", r.dst)?;
             }
             // The lines() iterator clips the newline by default, so the last line match is ""
             "" => {
