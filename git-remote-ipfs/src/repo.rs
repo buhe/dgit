@@ -101,12 +101,21 @@ impl Repo {
         Ok(())
     }
 
+     pub fn push_git_objects(
+        &mut self,
+        oids: &HashSet<Oid>,
+        repo: &Repository,
+        ipfs: &mut IpfsClient,
+    ) -> Result<(), Error> {
+        Ok(())
+    }
+
     pub fn push(&mut self,
         ref_src: &str,
         ref_dst: &str,
         force: bool,
         repo: &mut Repository,
-        // ipfs: &mut IpfsClient,
+        ipfs: &mut IpfsClient,
     ) -> Result<(), Error> {
 
         let reference = repo.find_reference(ref_src)?.resolve()?;
@@ -126,6 +135,9 @@ impl Repo {
         let mut objs_for_push = HashSet::new();
         self.find_all_objects(&obj.clone(), &mut objs_for_push, repo)?;
         debug!("git object is {:#?}", objs_for_push);
+
+        self.push_git_objects(&objs_for_push, repo, ipfs)?;
+
         Ok(())
     }
 }
