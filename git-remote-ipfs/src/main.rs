@@ -2,8 +2,9 @@ use std::{ io::{self, BufRead, BufReader, Write}, process, env};
 
 use env_logger::Builder;
 use git2::Repository;
-use ipfs_api_backend_hyper::IpfsClient;
+use ipfs_api_backend_hyper::{IpfsClient, IpfsApi};
 use log::{LevelFilter, trace, info, error, debug};
+use tokio::runtime::Runtime;
 
 use crate::{wallet_connect::connect, ref_parse::Ref, repo::Repo};
 
@@ -14,20 +15,22 @@ mod ref_parse;
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
-    init_logging(LevelFilter::Trace);
+    let mut runtime = Runtime::new().unwrap();
+
+    init_logging(LevelFilter::Debug);
     let mut args = env::args();
     trace!("Hello, world! {} {} {}", args.next().unwrap(), args.next().unwrap(), args.next().unwrap());
 
     let mut ipfs = IpfsClient::default();
-    // let stats = current_thread::block_on_all(ipfs.stats_repo())
-    //     .map_err(|e| {
-    //         error!("Could not connect to IPFS, are you sure `ipfs daemon` is running?");
-    //         debug!("Raw error: {}", e);
-    //         process::exit(1);
-    //     })
-    //     .unwrap();
+    let stats = ipfs.stats_repo().await
+        .map_err(|e| {
+            error!("Could not connect to IPFS, are you sure `ipfs daemon` is running?");
+            debug!("Raw error: {}", e);
+            process::exit(1);
+        })
+        .unwrap();
 
-    // debug!("IPFS connectivity OK. Datastore stats:\n{:#?}", stats);
+    debug!("IPFS connectivity OK. Datastore stats:\n{:#?}", stats);
     
     let mut input_handle = BufReader::new(io::stdin());
     let mut output_handle = io::stdout();
