@@ -107,6 +107,86 @@ impl Repo {
         repo: &Repository,
         ipfs: &mut IpfsClient,
     ) -> Result<(), Error> {
+        let oid_count = oids.len();
+        for (i, oid) in oids.iter().enumerate() {
+            let obj = repo.find_object(*oid, None)?;
+            trace!("Current object: {:?} at {}", obj.kind(), obj.id());
+
+            // if self.objects.contains_key(&obj.id().to_string()) {
+            //     warn!("push_objects: Object {} already in nip index", obj.id());
+            //     continue;
+            // }
+
+            let obj_type = obj.kind().ok_or_else(|| {
+                let msg = format!("Cannot determine type of object {}", obj.id());
+                error!("{}", msg);
+                format!("{}", msg)
+            }).unwrap();
+
+            match obj_type {
+                ObjectType::Commit => {
+                    let commit = obj
+                        .as_commit()
+                        .ok_or_else(|| format!("Could not view {:?} as a commit", obj)).unwrap();
+                    trace!("Pushing commit {:?}", commit);
+
+                    debug!(
+                        "[{}/{}] Commit {} uploaded to",
+                        i + 1,
+                        oid_count,
+                        obj.id(),
+                        // nip_object_hash
+                    );
+                }
+                ObjectType::Tree => {
+                    let tree = obj
+                        .as_tree()
+                        .ok_or_else(|| format!("Could not view {:?} as a tree", obj)).unwrap();
+                    trace!("Pushing tree {:?}", tree);
+
+                    debug!(
+                        "[{}/{}] Tree {} uploaded to",
+                        i + 1,
+                        oid_count,
+                        obj.id(),
+                        // nip_object_hash
+                    );
+                }
+                ObjectType::Blob => {
+                    let blob = obj
+                        .as_blob()
+                        .ok_or_else(|| format!("Could not view {:?} as a blob", obj)).unwrap();
+                    trace!("Pushing blob {:?}", blob);
+
+                    debug!(
+                        "[{}/{}] Blob {} uploaded to",
+                        i + 1,
+                        oid_count,
+                        obj.id(),
+                        // nip_object_hash
+                    );
+                }
+                ObjectType::Tag => {
+                    let tag = obj
+                        .as_tag()
+                        .ok_or_else(|| format!("Could not view {:?} as a tag", obj)).unwrap();
+                    trace!("Pushing tag {:?}", tag);
+
+
+                    debug!(
+                        "[{}/{}] Tag {} uploaded to",
+                        i + 1,
+                        oid_count,
+                        obj.id(),
+                        // nip_object_hash
+                    );
+                }
+                other => {
+                    error!(  "Don't know how to traverse a {}",
+                        other);
+                }
+            }
+        }
         Ok(())
     }
 
