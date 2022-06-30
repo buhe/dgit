@@ -822,6 +822,8 @@ dependencies = [
  "git2",
  "ipfs-api-backend-hyper",
  "log",
+ "serde",
+ "serde_derive",
  "tokio",
  "walletconnect",
  "web3",

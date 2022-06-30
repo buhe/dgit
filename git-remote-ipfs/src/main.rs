@@ -9,6 +9,9 @@ use web3::block_on;
 
 use crate::{wallet_connect::connect, ref_parse::Ref, repo::Repo};
 
+#[macro_use]
+extern crate serde_derive;
+
 mod wallet_connect;
 mod repo;
 mod object;
