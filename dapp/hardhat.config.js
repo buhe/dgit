@@ -37,6 +37,7 @@ module.exports = {
     }
   },
   abiExporter: {
+    path: '../git-remote-ipfs/src/abi',
     runOnCompile: true,
   }
 };

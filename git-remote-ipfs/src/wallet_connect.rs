@@ -1,9 +1,11 @@
 // use std::env;
 use std::error::Error;
+use std::str::FromStr;
 use log::info;
 use walletconnect::transport::WalletConnect;
 use walletconnect::{qr, Client, Metadata};
-use web3::types::TransactionRequest;
+use web3::contract::{Contract, Options};
+use web3::types::{TransactionRequest, Address};
 use web3::Web3;
 
 
@@ -51,13 +53,15 @@ pub async fn connect() -> Result<(), Box<dyn Error>> {
     // web3.eth().call(req, block)
     // info!("Transaction sent:\n  https://etherscan.io/tx/{:?}", tx);
 
-      let addr = Address::from_str("0x42447d5f59d5bf78a82c34663474922bdf278162").unwrap();
+    let addr = Address::from_str("0x22fCB380773027B246b0EAfafC1f996938f2eF14").unwrap();
     let token_contract =
-        Contract::from_json(web3s.eth(), addr, include_bytes!("erc20_abi.json")).unwrap();
-    let token_name: String = token_contract
-        .query("name", (), None, Options::default(), None)
+        Contract::from_json(web3.eth(), addr, include_bytes!("./abi/contracts/Greeter.sol/Greeter.json")).unwrap();
+    let greet: String = token_contract
+        .query("greet", (), None, Options::default(), None)
         .await
         .unwrap();
+
+    info!("greet {}", greet);
 
     Ok(())
 }
