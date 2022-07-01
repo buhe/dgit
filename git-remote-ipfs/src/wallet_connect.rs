@@ -32,18 +32,24 @@ pub async fn connect() -> Result<(), Box<dyn Error>> {
         info!(" - {:?}", account);
     }
 
-    let tx = web3
-        .eth()
-        .send_transaction(TransactionRequest {
-            from: accounts[0],
-            to: Some("000102030405060708090a0b0c0d0e0f10111213".parse()?),
-            value: Some(1_000_000_000_000_000u128.into()),
-            ..TransactionRequest::default()
-        })
-        .await?;
+        // Get current balance
+    let balance = web3.eth().balance(accounts[0], None).await?;
+
+    info!("Balance: {}", balance);
+
+    // let tx = web3
+    //     .eth()
+    //     .send_transaction(TransactionRequest {
+    //         from: accounts[0],
+    //         to: Some("000102030405060708090a0b0c0d0e0f10111213".parse()?),
+    //         value: Some(1_000_000_000_000_000u128.into()),
+    //         ..TransactionRequest::default()
+    //     })
+    //     .await?;
 
     info!("Transaction sent:\n  https://ropsten.etherscan.io/address/{}", accounts[0]);
-    info!("Transaction sent:\n  https://etherscan.io/tx/{:?}", tx);
+    // web3.eth().call(req, block)
+    // info!("Transaction sent:\n  https://etherscan.io/tx/{:?}", tx);
 
     Ok(())
 }
