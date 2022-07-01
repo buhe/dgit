@@ -5,7 +5,7 @@ use log::info;
 use walletconnect::transport::WalletConnect;
 use walletconnect::{qr, Client, Metadata};
 use web3::contract::{Contract, Options};
-use web3::types::{TransactionRequest, Address};
+use web3::types::{Address};
 use web3::Web3;
 
 

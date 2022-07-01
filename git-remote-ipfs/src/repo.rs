@@ -4,10 +4,14 @@ use git2::{Repository, Error, ObjectType, Object, Oid};
 use ipfs_api_backend_hyper::IpfsClient;
 use log::{debug, error, trace};
 
-#[derive(Debug)]
+use crate::object::GitObject;
+
+#[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub struct Repo {
     /// All refs this repository knows; a {name -> sha1} mapping
     pub refs: BTreeMap<String, String>,
+    /// All objects this repository contains; a {sha1 -> {type,IPFS hash}} map
+    pub objects: BTreeMap<String, GitObject>,
 }
 
 impl Repo {
@@ -92,7 +96,7 @@ impl Repo {
                     stack.push(tag.target()?);
                 }
                 other => {
-                    error!("unknow git object type")
+                    error!("unknow git object type {}", other)
                 }
             }
 
@@ -224,6 +228,6 @@ impl Repo {
 
 impl Default for Repo{
     fn default() -> Self {
-        Self { refs: Default::default() }
+        Self { refs: Default::default(), objects: Default::default() }
     }
 }
