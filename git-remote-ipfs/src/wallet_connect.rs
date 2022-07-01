@@ -51,5 +51,13 @@ pub async fn connect() -> Result<(), Box<dyn Error>> {
     // web3.eth().call(req, block)
     // info!("Transaction sent:\n  https://etherscan.io/tx/{:?}", tx);
 
+      let addr = Address::from_str("0x42447d5f59d5bf78a82c34663474922bdf278162").unwrap();
+    let token_contract =
+        Contract::from_json(web3s.eth(), addr, include_bytes!("erc20_abi.json")).unwrap();
+    let token_name: String = token_contract
+        .query("name", (), None, Options::default(), None)
+        .await
+        .unwrap();
+
     Ok(())
 }
