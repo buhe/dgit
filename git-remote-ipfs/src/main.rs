@@ -4,8 +4,6 @@ use env_logger::Builder;
 use git2::Repository;
 use ipfs_api_backend_hyper::{IpfsClient, IpfsApi};
 use log::{LevelFilter, trace, error, debug};
-// use tokio::{runtime::Runtime};
-use web3::block_on;
 
 use crate::{wallet_connect::connect, ref_parse::Ref, repo::Repo};
 
@@ -19,7 +17,6 @@ mod ref_parse;
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
-    // let mut runtime = Runtime::new().unwrap();
 
     init_logging(LevelFilter::Debug);
     let mut args = env::args();
@@ -27,10 +24,8 @@ async fn main() -> std::io::Result<()> {
 
     let mut ipfs = IpfsClient::default();
 
-    // let rt  = Runtime::new().unwrap();
-
 // Execute the future, blocking the current thread until completion
-    let stats = block_on(ipfs.stats_repo())
+    let stats = futures::executor::block_on(ipfs.stats_repo())
         .map_err(|e| {
             error!("Could not connect to IPFS, are you sure `ipfs daemon` is running?");
             debug!("Raw error: {}", e);
@@ -45,7 +40,7 @@ async fn main() -> std::io::Result<()> {
 
     handle_capabilities(&mut input_handle, &mut output_handle)?;
     handle_list(&mut input_handle, &mut output_handle)?;
-    // connect().await.unwrap();
+    connect().await.unwrap();
 
     handle_fetches_and_pushes(&mut input_handle, &mut output_handle, &mut ipfs)?;
     // Ok(for line in input_handle.lines() {
