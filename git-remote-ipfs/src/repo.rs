@@ -5,7 +5,7 @@ use ipfs_api_backend_hyper::IpfsClient;
 use log::{debug, error, trace};
 
 use crate::object::GitObject;
-
+// serialize to json
 #[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub struct Repo {
     /// All refs this repository knows; a {name -> sha1} mapping
