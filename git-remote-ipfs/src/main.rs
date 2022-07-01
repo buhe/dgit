@@ -18,7 +18,7 @@ mod ref_parse;
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
 
-    init_logging(LevelFilter::Debug);
+    init_logging(LevelFilter::Trace);
     let mut args = env::args();
     trace!("Hello, world! {} {} {}", args.next().unwrap(), args.next().unwrap(), args.next().unwrap());
 
