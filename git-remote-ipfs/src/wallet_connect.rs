@@ -56,6 +56,14 @@ pub async fn connect() -> Result<(), Box<dyn Error>> {
     let addr = Address::from_str("0x22fCB380773027B246b0EAfafC1f996938f2eF14").unwrap();
     let token_contract =
         Contract::from_json(web3.eth(), addr, include_bytes!("./abi/contracts/Greeter.sol/Greeter.json")).unwrap();
+
+    let tx = token_contract
+        .call("setGreeting", "hi bugu".to_string(), accounts[0], Options::default())
+        .await
+        .unwrap();
+
+    info!("tx is {}", tx);
+
     let greet: String = token_contract
         .query("greet", (), None, Options::default(), None)
         .await
