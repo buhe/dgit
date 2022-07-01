@@ -25,9 +25,9 @@ pub async fn connect() -> Result<(), Box<dyn Error>> {
 
     let wc = WalletConnect::new(client, "3f433221d3db475db058b3875a617fdd")?;
     let web3 = Web3::new(wc);
-
+    
     let accounts = web3.eth().accounts().await?;
-    println!("Connected accounts:");
+    info!("Connected accounts:");
     for account in &accounts {
         info!(" - {:?}", account);
     }
