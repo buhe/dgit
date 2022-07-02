@@ -5,7 +5,8 @@ use git2::Repository;
 use ipfs_api_backend_hyper::{IpfsClient, IpfsApi};
 use log::{LevelFilter, trace, error, debug};
 
-use crate::{wallet_connect::connect, ref_parse::Ref, repo::Repo};
+use crate::{ref_parse::Ref, repo::Repo};
+use crate::wallet_connect::Wallet;
 
 #[macro_use]
 extern crate serde_derive;
@@ -40,9 +41,9 @@ async fn main() -> std::io::Result<()> {
 
     handle_capabilities(&mut input_handle, &mut output_handle)?;
     handle_list(&mut input_handle, &mut output_handle)?;
-    connect().await.unwrap();
+    // connect().await.unwrap();
 
-    handle_fetches_and_pushes(&mut input_handle, &mut output_handle, &mut ipfs)?;
+    handle_fetches_and_pushes(&mut input_handle, &mut output_handle, &mut ipfs).await?;
     // Ok(for line in input_handle.lines() {
     //     let line_buf = line?;
     //     match line_buf.as_str() {
@@ -57,7 +58,7 @@ fn handle_capabilities(input_handle: &mut dyn BufRead, output_handle: &mut dyn W
     input_handle.read_line(&mut line_buf)?;
     match line_buf.as_str() {
         "capabilities\n" => {
-            let response = &mut ["push"].join("\n");
+            let response = &mut ["push", "fetch"].join("\n");
             response.push_str("\n\n");
             output_handle.write_all(response.as_bytes())?;
         }
@@ -97,12 +98,14 @@ fn handle_list(
     Ok(())
 }
 
-fn handle_fetches_and_pushes(
+async fn handle_fetches_and_pushes(
     input_handle: &mut dyn BufRead,
     output_handle: &mut dyn Write,
     ipfs: &mut IpfsClient
 ) -> std::io::Result<()> {
     let mut repo = Repo::default();
+    let mut wallet = Wallet::default();
+    wallet.connect().await.unwrap();
     for line in input_handle.lines() {
         let line_buf = line?;
         match line_buf.as_str() {
@@ -121,6 +124,8 @@ fn handle_fetches_and_pushes(
 
                 debug!("repo:{:#?}", &repo);
                 writeln!(output_handle, "ok {}", &r.dst)?;
+                let repo_ipfs_hash = repo.save(ipfs).unwrap();
+                wallet.save(repo_ipfs_hash).await.unwrap();
             }
             // The lines() iterator clips the newline by default, so the last line match is ""
             "" => {
@@ -137,17 +142,14 @@ fn handle_fetches_and_pushes(
         }
     }
 
-    try_push_repo(ipfs, &mut repo)?;
+
 
     // Upload current_idx to IPFS if it differs from the original idx
     // Tell git that we're done
     writeln!(output_handle)?;
     Ok(())
 }
-fn try_push_repo(ipfs: &mut IpfsClient, repo: &mut Repo) -> std::io::Result<()> {
-    repo.save(ipfs).unwrap();
-    Ok(())
-}
+
 pub fn init_logging(default_lvl: LevelFilter) {
     match env::var("RUST_LOG") {
         Ok(_) => env_logger::init(),

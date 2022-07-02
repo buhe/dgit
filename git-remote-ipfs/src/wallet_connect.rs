@@ -3,73 +3,83 @@ use std::error::Error;
 use std::str::FromStr;
 use log::info;
 use walletconnect::transport::WalletConnect;
-use walletconnect::{qr, Client, Metadata};
+use walletconnect::{qr, Client, Metadata, H160};
 use web3::contract::{Contract, Options};
-use web3::types::{Address};
+use web3::transports::Http;
+use web3::types::Address;
 use web3::Web3;
 
+pub struct Wallet {
+    contract: Option<Contract<WalletConnect<Http>>>,
+    account: Option<H160>,
+}
 
-pub async fn connect() -> Result<(), Box<dyn Error>> {
-    // env_logger::init();
+impl Wallet {
+    pub async fn connect(&mut self) -> Result<(), Box<dyn Error>> {
 
-    let client = Client::new(
-        "examples-web3",
-        Metadata {
-            description: "WalletConnect-rs web3 transport example.".into(),
-            url: "https://github.com/nlordell/walletconnect-rs".parse()?,
-            icons: vec!["https://avatars0.githubusercontent.com/u/4210206".parse()?],
-            name: "WalletConnect-rs Web3 Example".into(),
-        },
-    )?;
+        let client = Client::new(
+            "examples-web3",
+            Metadata {
+                description: "WalletConnect-rs web3 transport example.".into(),
+                url: "https://github.com/nlordell/walletconnect-rs".parse()?,
+                icons: vec!["https://avatars0.githubusercontent.com/u/4210206".parse()?],
+                name: "WalletConnect-rs Web3 Example".into(),
+            },
+        )?;
 
 
-    client.ensure_session(qr::print_with_url).await?;
+        client.ensure_session(qr::print_with_url).await?;
 
-    let wc = WalletConnect::new(client, "3f433221d3db475db058b3875a617fdd")?;
-    let web3 = Web3::new(wc);
-    
-    let accounts = web3.eth().accounts().await?;
-    info!("Connected accounts:");
-    for account in &accounts {
-        info!(" - {:?}", account);
+        let wc = WalletConnect::new(client, "3f433221d3db475db058b3875a617fdd")?;
+        let web3 = Web3::new(wc);
+        
+        let accounts = web3.eth().accounts().await?;
+        info!("Connected accounts:");
+        for account in &accounts {
+            info!(" - {:?}", account);
+        }
+
+        self.account = Some(accounts[0]);
+
+            // Get current balance
+        let balance = web3.eth().balance(accounts[0], None).await?;
+
+        info!("Balance: {}", balance);
+
+        info!("Transaction sent:\n  https://ropsten.etherscan.io/address/{}", accounts[0]);
+        let addr = Address::from_str("0x22fCB380773027B246b0EAfafC1f996938f2eF14").unwrap();
+        self.contract =
+            Some(Contract::from_json(web3.eth(), addr, include_bytes!("./abi/contracts/Greeter.sol/Greeter.json")).unwrap());
+
+        Ok(())
     }
 
-        // Get current balance
-    let balance = web3.eth().balance(accounts[0], None).await?;
+    pub async fn save(&self, hash: String) -> Result<(), Box<dyn Error>> {
 
-    info!("Balance: {}", balance);
+        let tx = self.contract.as_ref().unwrap()
+            .call("setGreeting", hash, self.account.unwrap(), Options::default())
+            .await
+            .unwrap();
 
-    // let tx = web3
-    //     .eth()
-    //     .send_transaction(TransactionRequest {
-    //         from: accounts[0],
-    //         to: Some("000102030405060708090a0b0c0d0e0f10111213".parse()?),
-    //         value: Some(1_000_000_000_000_000u128.into()),
-    //         ..TransactionRequest::default()
-    //     })
-    //     .await?;
+        info!("tx is {}", tx);
 
-    info!("Transaction sent:\n  https://ropsten.etherscan.io/address/{}", accounts[0]);
-    // web3.eth().call(req, block)
-    // info!("Transaction sent:\n  https://etherscan.io/tx/{:?}", tx);
+        Ok(())
+    }
 
-    let addr = Address::from_str("0x22fCB380773027B246b0EAfafC1f996938f2eF14").unwrap();
-    let token_contract =
-        Contract::from_json(web3.eth(), addr, include_bytes!("./abi/contracts/Greeter.sol/Greeter.json")).unwrap();
 
-    let tx = token_contract
-        .call("setGreeting", "hi bugu".to_string(), accounts[0], Options::default())
-        .await
-        .unwrap();
+    pub async fn load(&self) -> Result<String, Box<dyn Error>> {
+        let greet: String = self.contract.as_ref().unwrap()
+            .query("greet", (), None, Options::default(), None)
+            .await
+            .unwrap();
 
-    info!("tx is {}", tx);
+        info!("greet {}", greet);
+        Ok(greet)
+    }
+}
 
-    let greet: String = token_contract
-        .query("greet", (), None, Options::default(), None)
-        .await
-        .unwrap();
-
-    info!("greet {}", greet);
-
-    Ok(())
+impl Default for Wallet {
+    fn default() -> Self {
+        Self{ contract: None, account: None }
+    }
 }

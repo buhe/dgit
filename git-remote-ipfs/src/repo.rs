@@ -2,7 +2,7 @@ use std::{collections::{BTreeMap, HashSet}, io::Cursor};
 use failure::Error;
 use git2::{Repository, ObjectType, Object, Oid};
 use ipfs_api_backend_hyper::{IpfsClient, IpfsApi};
-use log::{debug, error, trace, info};
+use log::{debug, error, trace};
 
 use crate::object::GitObject;
 // serialize to json
@@ -250,14 +250,14 @@ impl Repo {
         Ok(())
     }
 
-    pub fn save(&mut self,ipfs: &mut IpfsClient) -> Result<(), Error> {
+    pub fn save(&mut self,ipfs: &mut IpfsClient) -> Result<String, Error> {
         let self_buf = serde_json::to_string(self).unwrap();
         // Upload
         let add_req = ipfs.add(Cursor::new(self_buf));
         let new_hash = format!("/ipfs/{}", futures::executor::block_on(add_req)?.hash);
-        info!("hash is {}", new_hash);
+        debug!("hash is {}", new_hash);
 
-        Ok(())
+        Ok(new_hash)
     }
 }
 
