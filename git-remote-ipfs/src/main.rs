@@ -58,7 +58,7 @@ fn handle_capabilities(input_handle: &mut dyn BufRead, output_handle: &mut dyn W
     input_handle.read_line(&mut line_buf)?;
     match line_buf.as_str() {
         "capabilities\n" => {
-            let response = &mut ["push", "fetch"].join("\n");
+            let response = &mut ["push", "fetch", "clone"].join("\n");
             response.push_str("\n\n");
             output_handle.write_all(response.as_bytes())?;
         }
@@ -126,6 +126,9 @@ async fn handle_fetches_and_pushes(
                 writeln!(output_handle, "ok {}", &r.dst)?;
                 let repo_ipfs_hash = repo.save(ipfs).unwrap();
                 wallet.save(repo_ipfs_hash).await.unwrap();
+            }
+            clone_line if clone_line.starts_with("clone") => {
+                trace!("Raw clone line {:?}", clone_line);
             }
             // The lines() iterator clips the newline by default, so the last line match is ""
             "" => {
