@@ -102,7 +102,8 @@ fn handle_fetches_and_pushes(
     output_handle: &mut dyn Write,
     ipfs: &mut IpfsClient
 ) -> std::io::Result<()> {
-         for line in input_handle.lines() {
+    let mut repo = Repo::default();
+    for line in input_handle.lines() {
         let line_buf = line?;
         match line_buf.as_str() {
             // fetch <sha> <ref_name>
@@ -114,7 +115,7 @@ fn handle_fetches_and_pushes(
                 trace!("Raw push line {:?}", push_line);
                 // Tell git we're done with this ref
                 let r: Ref = push_line.parse().unwrap();
-                let mut repo = Repo::default();
+                
                 let mut git_repo = Repository::open_from_env().unwrap();
                 repo.push(&r.src, &r.dst, r.force, &mut git_repo, ipfs).unwrap();
 
@@ -136,12 +137,17 @@ fn handle_fetches_and_pushes(
         }
     }
 
+    try_push_repo(ipfs, &mut repo)?;
+
     // Upload current_idx to IPFS if it differs from the original idx
     // Tell git that we're done
     writeln!(output_handle)?;
     Ok(())
 }
-
+fn try_push_repo(ipfs: &mut IpfsClient, repo: &mut Repo) -> std::io::Result<()> {
+    repo.save(ipfs).unwrap();
+    Ok(())
+}
 pub fn init_logging(default_lvl: LevelFilter) {
     match env::var("RUST_LOG") {
         Ok(_) => env_logger::init(),

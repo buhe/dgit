@@ -1,6 +1,6 @@
 use std::{collections::BTreeSet, io::Cursor};
-use failure::Error;
 
+use failure::Error;
 use git2::{Blob, Odb, Commit, Tag, Tree, OdbObject};
 use ipfs_api_backend_hyper::{IpfsClient, IpfsApi};
 #[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]

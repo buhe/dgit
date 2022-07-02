@@ -1,8 +1,8 @@
-use std::collections::{BTreeMap, HashSet};
-
-use git2::{Repository, Error, ObjectType, Object, Oid};
-use ipfs_api_backend_hyper::IpfsClient;
-use log::{debug, error, trace};
+use std::{collections::{BTreeMap, HashSet}, io::Cursor};
+use failure::Error;
+use git2::{Repository, ObjectType, Object, Oid};
+use ipfs_api_backend_hyper::{IpfsClient, IpfsApi};
+use log::{debug, error, trace, info};
 
 use crate::object::GitObject;
 // serialize to json
@@ -134,6 +134,12 @@ impl Repo {
                         .ok_or_else(|| format!("Could not view {:?} as a commit", obj)).unwrap();
                     trace!("Pushing commit {:?}", commit);
 
+                    let object =
+                        GitObject::from_git_commit(&commit, &repo.odb()?, ipfs)?;
+
+                    self.objects
+                        .insert(format!("{}", obj.id()), object.clone());
+
                     debug!(
                         "[{}/{}] Commit {} uploaded to",
                         i + 1,
@@ -147,6 +153,11 @@ impl Repo {
                         .as_tree()
                         .ok_or_else(|| format!("Could not view {:?} as a tree", obj)).unwrap();
                     trace!("Pushing tree {:?}", tree);
+                    let object =
+                        GitObject::from_git_tree(&tree, &repo.odb()?, ipfs)?;
+
+                    self.objects
+                        .insert(format!("{}", obj.id()), object.clone());
 
                     debug!(
                         "[{}/{}] Tree {} uploaded to",
@@ -162,6 +173,13 @@ impl Repo {
                         .ok_or_else(|| format!("Could not view {:?} as a blob", obj)).unwrap();
                     trace!("Pushing blob {:?}", blob);
 
+                    let object =
+                        GitObject::from_git_blob(&blob, &repo.odb()?, ipfs)?;
+
+                    self.objects
+                        .insert(format!("{}", obj.id()), object.clone());
+
+
                     debug!(
                         "[{}/{}] Blob {} uploaded to",
                         i + 1,
@@ -175,6 +193,12 @@ impl Repo {
                         .as_tag()
                         .ok_or_else(|| format!("Could not view {:?} as a tag", obj)).unwrap();
                     trace!("Pushing tag {:?}", tag);
+
+                    let object =
+                        GitObject::from_git_tag(&tag, &repo.odb()?, ipfs)?;
+
+                    self.objects
+                        .insert(format!("{}", obj.id()), object.clone());
 
 
                     debug!(
@@ -197,7 +221,7 @@ impl Repo {
     pub fn push(&mut self,
         ref_src: &str,
         ref_dst: &str,
-        force: bool,
+        _force: bool,
         repo: &mut Repository,
         ipfs: &mut IpfsClient,
     ) -> Result<(), Error> {
@@ -221,10 +245,22 @@ impl Repo {
         debug!("git object is {:#?}", objs_for_push);
 
         self.push_git_objects(&objs_for_push, repo, ipfs)?;
+        self.refs
+            .insert(ref_dst.to_owned(), format!("{}", obj.id()));
+        Ok(())
+    }
+
+    pub fn save(&mut self,ipfs: &mut IpfsClient) -> Result<(), Error> {
+        let self_buf = serde_json::to_string(self).unwrap();
+        // Upload
+        let add_req = ipfs.add(Cursor::new(self_buf));
+        let new_hash = format!("/ipfs/{}", futures::executor::block_on(add_req)?.hash);
+        info!("hash is {}", new_hash);
 
         Ok(())
     }
 }
+
 
 impl Default for Repo{
     fn default() -> Self {
