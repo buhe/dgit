@@ -5,7 +5,7 @@ use git2::Repository;
 use ipfs_api_backend_hyper::{IpfsClient, IpfsApi};
 use log::{LevelFilter, trace, error, debug};
 
-use crate::{ref_parse::Ref, repo::Repo};
+use crate::{ref_parse::{PushRef, FetchRef}, repo::Repo};
 use crate::wallet_connect::Wallet;
 
 #[macro_use]
@@ -133,18 +133,25 @@ async fn handle_fetches_and_pushes(
             // fetch <sha> <ref_name>
             fetch_line if fetch_line.starts_with("fetch") => {
                 trace!("Raw fetch line {:?}", fetch_line);
+                let r: FetchRef = fetch_line.parse().unwrap();
+                
+                let mut git_repo = Repository::open_from_env().unwrap();
+
+                repo.fetch(&r.hash, &r.ref_name, &mut git_repo, ipfs).unwrap();
+
+                debug!("fetch repo:{:#?} done.", &repo);
             }
             // push <refspec>
             push_line if push_line.starts_with("push") => {
                 trace!("Raw push line {:?}", push_line);
                 // Tell git we're done with this ref
-                let r: Ref = push_line.parse().unwrap();
+                let r: PushRef = push_line.parse().unwrap();
                 
                 let mut git_repo = Repository::open_from_env().unwrap();
 
                 repo.push(&r.src, &r.dst, r.force, &mut git_repo, ipfs).unwrap();
 
-                debug!("repo:{:#?}", &repo);
+                debug!("push repo:{:#?} done.", &repo);
                 writeln!(output_handle, "ok {}", &r.dst)?;
                 let repo_ipfs_hash = repo.save(ipfs).unwrap();
                 wallet.save(repo_ipfs_hash).await.unwrap();

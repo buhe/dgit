@@ -2,11 +2,11 @@ use std::str;
 use std::{collections::{BTreeMap, HashSet}, io::Cursor};
 use failure::Error;
 use futures::TryStreamExt;
-use git2::{Repository, ObjectType, Object, Oid};
+use git2::{Repository, ObjectType, Object, Oid, Odb};
 use ipfs_api_backend_hyper::{IpfsClient, IpfsApi};
-use log::{debug, error, trace};
+use log::{debug, error, trace, warn};
 
-use crate::object::GitObject;
+use crate::object::{GitObject, ObjectMetadata};
 // serialize to json
 #[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub struct Repo {
@@ -280,8 +280,169 @@ impl Repo {
 
         Ok(new_hash)
     }
-}
 
+    pub fn fetch(&self, hash: &str, ref_name: &str, git_repo: &mut Repository, ipfs: &mut IpfsClient) -> Result<(), Error> {
+        debug!("Fetching {} for {}", hash, ref_name);
+
+        let git_hash_oid = Oid::from_str(hash)?;
+        let mut oids_for_fetch = HashSet::new();
+
+        self.enumerate_for_fetch(git_hash_oid, &mut oids_for_fetch, git_repo)?;
+    
+        debug!(
+            "Counted {} object(s) for fetch:\n{:#?}",
+            oids_for_fetch.len(),
+            oids_for_fetch
+        );
+
+        self.fetch_nip_objects(&oids_for_fetch, git_repo, ipfs)?;
+
+        match git_repo.odb()?.read_header(git_hash_oid)?.1 {
+            ObjectType::Commit if ref_name.starts_with("refs/tags") => {
+                debug!("Not setting ref for lightweight tag {}", ref_name);
+            }
+            ObjectType::Commit => {
+                git_repo.reference(ref_name, git_hash_oid, true, "ipfs fetch")?;
+            }
+            // Somehow git is upset when we set tag refs for it
+            ObjectType::Tag => {
+                debug!("Not setting ref for tag {}", ref_name);
+            }
+            other_type => {
+                let msg = format!("New tip turned out to be a {} after fetch", other_type);
+                error!("{}", msg);
+            }
+        }
+
+        debug!("Fetched {} for {} OK.", hash, ref_name);
+        Ok(())
+    }
+
+     /// Fill a hash set with `oid`'s children that are present in `self` but missing in `repo`.
+    pub fn enumerate_for_fetch(
+        &self,
+        oid: Oid,
+        fetch_todo: &mut HashSet<Oid>,
+        repo: &Repository,
+    ) -> Result<(), Error> {
+        let mut stack = vec![oid];
+        let mut obj_cnt = 1;
+
+        while let Some(oid) = stack.pop() {
+            if repo.odb()?.read_header(oid).is_ok() {
+                trace!("Object {} already present locally!", oid);
+                continue;
+            }
+
+            if fetch_todo.contains(&oid) {
+                trace!("Object {} already present in state!", oid);
+                continue;
+            }
+
+            let git_object = self
+                .objects
+                .get(&format!("{}", oid))
+                .ok_or_else(|| {
+                    let msg = format!("Could not find object {} in the index", oid);
+                    error!("{}", msg);
+                    format!("{}", msg)
+                }).unwrap()
+                .clone();
+
+            // if nip_obj_ipfs_hash == SUBMODULE_TIP_MARKER {
+            //     debug!("Ommitting submodule {}", oid.to_string());
+            //     return Ok(());
+            // }
+
+            fetch_todo.insert(oid);
+
+            // let nip_obj = NIPObject::ipfs_get(&nip_obj_ipfs_hash, ipfs)?;
+
+            match git_object.clone().metadata {
+                ObjectMetadata::Commit {
+                    parent_git_hashes,
+                    tree_git_hash,
+                } => {
+                    debug!("[{}] Counting nip commit {}", obj_cnt, git_object.raw_data_ipfs_hash);
+
+                    stack.push(Oid::from_str(&tree_git_hash)?);
+
+                    for parent_git_hash in parent_git_hashes {
+                        stack.push(Oid::from_str(&parent_git_hash)?);
+                    }
+                }
+                ObjectMetadata::Tag { target_git_hash } => {
+                    debug!("[{}] Counting nip tag {}", obj_cnt, git_object.raw_data_ipfs_hash);
+
+                    stack.push(Oid::from_str(&target_git_hash)?);
+                }
+                ObjectMetadata::Tree { entry_git_hashes } => {
+                    debug!("[{}] Counting nip tree {}", obj_cnt, git_object.raw_data_ipfs_hash);
+
+                    for entry_git_hash in entry_git_hashes {
+                        stack.push(Oid::from_str(&entry_git_hash)?);
+                    }
+                }
+                ObjectMetadata::Blob => {
+                    debug!("[{}] Counting nip blob {}", obj_cnt, git_object.raw_data_ipfs_hash);
+                }
+            }
+            obj_cnt += 1;
+        }
+
+        Ok(())
+    }
+
+    /// Download git objects in `oids` from IPFS and instantiate them in `repo`.
+    pub fn fetch_nip_objects(
+        &self,
+        oids: &HashSet<Oid>,
+        repo: &mut Repository,
+        ipfs: &mut IpfsClient,
+    ) -> Result<(), Error> {
+        for (i, &oid) in oids.iter().enumerate() {
+            debug!("[{}/{}] Fetching object {}", i + 1, oids.len(), oid);
+
+            let git_object = self.objects.get(&format!("{}", oid)).ok_or_else(|| {
+                let msg = format!("Could not find object {} in nip index", oid);
+                error!("{}", msg);
+                format!("{}", msg)
+            }).unwrap();
+
+            let content = GitObject::ipfs_get(git_object.raw_data_ipfs_hash.clone(), ipfs)?;
+
+            trace!("git object is {:#?}", git_object);
+
+            if repo.odb()?.read_header(oid).is_ok() {
+                warn!("fetch_nip_objects: Object {} already present locally!", oid);
+                continue;
+            }
+
+            let written_oid = write_raw_data(&mut repo.odb()?, &content[..], &git_object.metadata)?;
+            if written_oid != oid {
+                let msg = format!("Object tree inconsistency detected: fetched {} from {}, but write result hashes to {}", oid, git_object.raw_data_ipfs_hash, written_oid);
+                error!("{}", msg);
+            }
+            trace!("Fetched object {} to {}", git_object.raw_data_ipfs_hash, written_oid);
+        }
+        Ok(())
+    }
+
+
+
+
+}
+    fn write_raw_data(odb: &mut Odb, content: &[u8], metadata: &ObjectMetadata) -> Result<Oid, Error> {
+
+        let obj_type = match metadata {
+            ObjectMetadata::Blob => ObjectType::Blob,
+            ObjectMetadata::Commit { .. } => ObjectType::Commit,
+            ObjectMetadata::Tag { .. } => ObjectType::Tag,
+            ObjectMetadata::Tree { .. } => ObjectType::Tree,
+        };
+
+        Ok(odb.write(obj_type, content)?)
+    }
 
 impl Default for Repo{
     fn default() -> Self {

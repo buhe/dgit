@@ -1,8 +1,10 @@
 use std::{collections::BTreeSet, io::Cursor};
 
 use failure::Error;
+use futures::TryStreamExt;
 use git2::{Blob, Odb, Commit, Tag, Tree, OdbObject};
 use ipfs_api_backend_hyper::{IpfsClient, IpfsApi};
+use log::{error, debug};
 #[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 /// representation of a git object
 pub struct GitObject {
@@ -97,7 +99,23 @@ impl GitObject {
         })
     }
 
-      /// Upload `odb_obj` to IPFS and return the link.
+      /// Download from IPFS and instantiate a `Object`.
+    pub fn ipfs_get(hash: String, ipfs: &mut IpfsClient) -> Result<Vec<u8>, Error> {
+       let req = ipfs
+            .cat(hash.as_str())
+            .map_ok(|chunk| chunk.to_vec())
+            .try_concat();
+        let content = futures::executor::block_on(req).map_err(|e| {
+            error!("Could not cat ipfs file");
+            debug!("Raw error: {}", e);
+            // process::exit(1);
+        })
+        .unwrap();
+
+        Ok(content)
+    }
+
+        /// Upload `odb_obj` to IPFS and return the link.
     fn upload_odb_obj(odb_obj: &OdbObject, ipfs: &mut IpfsClient) -> Result<String, Error> {
         let obj_buf = odb_obj.data().to_vec();
 
@@ -105,4 +123,5 @@ impl GitObject {
         let ipfs_hash = futures::executor::block_on(raw_data_req)?.hash;
         Ok(format!("/ipfs/{}", ipfs_hash))
     }
+
 }
