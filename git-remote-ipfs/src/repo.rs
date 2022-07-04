@@ -1,5 +1,7 @@
+use std::str;
 use std::{collections::{BTreeMap, HashSet}, io::Cursor};
 use failure::Error;
+use futures::TryStreamExt;
 use git2::{Repository, ObjectType, Object, Oid};
 use ipfs_api_backend_hyper::{IpfsClient, IpfsApi};
 use log::{debug, error, trace};
@@ -15,6 +17,25 @@ pub struct Repo {
 }
 
 impl Repo {
+    pub fn build(ipfs_hash: String, ipfs: &mut IpfsClient) -> Self {
+        let req = ipfs
+            .cat(ipfs_hash.as_str())
+            .map_ok(|chunk| chunk.to_vec())
+            .try_concat();
+        let content = futures::executor::block_on(req).map_err(|e| {
+            error!("Could not cat ipfs file");
+            debug!("Raw error: {}", e);
+            // process::exit(1);
+        })
+        .unwrap();
+
+        let content = String::from_utf8(content).unwrap();
+
+        debug!("build {}", content);
+
+        serde_json::from_str(content.as_str()).unwrap()
+    }
+
     pub fn find_all_objects   (&self,
         obj: &Object,
         push_todo: &mut HashSet<Oid>,
@@ -105,7 +126,39 @@ impl Repo {
         Ok(())
     }
 
-     pub fn push_git_objects(
+     pub fn push(&mut self,
+        ref_src: &str,
+        ref_dst: &str,
+        _force: bool,
+        repo: &mut Repository,
+        ipfs: &mut IpfsClient,
+    ) -> Result<(), Error> {
+
+        let reference = repo.find_reference(ref_src)?.resolve()?;
+
+        // Differentiate between annotated tags and their commit representation
+        let obj = reference
+            .peel(ObjectType::Tag)
+            .unwrap_or(reference.peel(ObjectType::Commit)?);
+
+        debug!(
+            "{:?} dereferenced to {:?} {}",
+            reference.shorthand(),
+            obj.kind(),
+            obj.id()
+        );
+
+        let mut objs_for_push = HashSet::new();
+        self.find_all_objects(&obj.clone(), &mut objs_for_push, repo)?;
+        debug!("git object is {:#?}", objs_for_push);
+
+        self.push_git_objects(&objs_for_push, repo, ipfs)?;
+        self.refs
+            .insert(ref_dst.to_owned(), format!("{}", obj.id()));
+        Ok(())
+    }
+
+    pub fn push_git_objects(
         &mut self,
         oids: &HashSet<Oid>,
         repo: &Repository,
@@ -215,38 +268,6 @@ impl Repo {
                 }
             }
         }
-        Ok(())
-    }
-
-    pub fn push(&mut self,
-        ref_src: &str,
-        ref_dst: &str,
-        _force: bool,
-        repo: &mut Repository,
-        ipfs: &mut IpfsClient,
-    ) -> Result<(), Error> {
-
-        let reference = repo.find_reference(ref_src)?.resolve()?;
-
-        // Differentiate between annotated tags and their commit representation
-        let obj = reference
-            .peel(ObjectType::Tag)
-            .unwrap_or(reference.peel(ObjectType::Commit)?);
-
-        debug!(
-            "{:?} dereferenced to {:?} {}",
-            reference.shorthand(),
-            obj.kind(),
-            obj.id()
-        );
-
-        let mut objs_for_push = HashSet::new();
-        self.find_all_objects(&obj.clone(), &mut objs_for_push, repo)?;
-        debug!("git object is {:#?}", objs_for_push);
-
-        self.push_git_objects(&objs_for_push, repo, ipfs)?;
-        self.refs
-            .insert(ref_dst.to_owned(), format!("{}", obj.id()));
         Ok(())
     }
 

@@ -35,15 +35,22 @@ async fn main() -> std::io::Result<()> {
         .unwrap();
 
     debug!("IPFS connectivity OK. Datastore stats:\n{:#?}", stats);
+
+    let mut wallet = Wallet::default();
+    wallet.connect().await.unwrap();
+
+    let ipfs_hash = wallet.load().await.unwrap();// todo: when repo not push, hash is none
+    debug!("repo ipfs hash is {}", ipfs_hash);
+    let mut repo = Repo::build(ipfs_hash, &mut ipfs);
     
     let mut input_handle = BufReader::new(io::stdin());
     let mut output_handle = io::stdout();
 
     handle_capabilities(&mut input_handle, &mut output_handle)?;
-    handle_list(&mut input_handle, &mut output_handle)?;
+    handle_list(&mut input_handle, &mut output_handle, &repo)?;
     // connect().await.unwrap();
 
-    handle_fetches_and_pushes(&mut input_handle, &mut output_handle, &mut ipfs).await?;
+    handle_fetches_and_pushes(&mut input_handle, &mut output_handle, &mut ipfs, &mut repo, &mut wallet).await?;
     // Ok(for line in input_handle.lines() {
     //     let line_buf = line?;
     //     match line_buf.as_str() {
@@ -58,12 +65,13 @@ fn handle_capabilities(input_handle: &mut dyn BufRead, output_handle: &mut dyn W
     input_handle.read_line(&mut line_buf)?;
     match line_buf.as_str() {
         "capabilities\n" => {
-            let response = &mut ["push", "fetch", "clone"].join("\n");
+            let response = &mut ["push", "fetch"].join("\n");
             response.push_str("\n\n");
             output_handle.write_all(response.as_bytes())?;
+            debug!("call capabilities");
         }
         other => {
-            println!("Received unexpected command {:?}", other);
+            debug!("Received unexpected command {:?}", other);
         }
     }
     Ok(())
@@ -72,6 +80,7 @@ fn handle_capabilities(input_handle: &mut dyn BufRead, output_handle: &mut dyn W
 fn handle_list(
     input_handle: &mut dyn BufRead,
     output_handle: &mut dyn Write,
+    repo: &Repo,
 ) -> std::io::Result<()> {
     let mut line_buf = String::new();
     input_handle.read_line(&mut line_buf)?;
@@ -79,20 +88,31 @@ fn handle_list(
     // Consume the command line
     match line_buf.as_str() {
         list if list.starts_with("list") => {
-            // trace!("Consumed the \"list*\" command");
+            // trace!("Consumed the \"list*\" command {}", list);
         }
         // Sometimes git needs to finish early, e.g. when the local ref doesn't even exist locally
         "\n" => {
-            // debug!("Git finished early, exiting...");
+            debug!("Git finished early, exiting...");
             process::exit(0);
         }
         other => {
             let msg = format!("Expected a \"list*\" command, got {:?}", other);
-            println!("{}", msg);
+            error!("{}", msg);
         }
     }
 
+    // output_handle.write_all(b"\n")?;
+
+    for (name, git_hash) in &repo.refs {
+        let output = format!("{} {}", git_hash, name);
+        debug!("fetch from {}", output);
+        writeln!(output_handle, "{}", output)?;
+    }
     output_handle.write_all(b"\n")?;
+
+    // // Indicate that we're done listing
+    // // writeln!(output_handle,"refs/heads/master HEAD")?;
+    // writeln!(output_handle)?;
 
     
     Ok(())
@@ -101,11 +121,12 @@ fn handle_list(
 async fn handle_fetches_and_pushes(
     input_handle: &mut dyn BufRead,
     output_handle: &mut dyn Write,
-    ipfs: &mut IpfsClient
+    ipfs: &mut IpfsClient,
+    repo: &mut Repo,
+    wallet: &mut Wallet,
 ) -> std::io::Result<()> {
-    let mut repo = Repo::default();
-    let mut wallet = Wallet::default();
-    wallet.connect().await.unwrap();
+    
+   
     for line in input_handle.lines() {
         let line_buf = line?;
         match line_buf.as_str() {
@@ -120,6 +141,7 @@ async fn handle_fetches_and_pushes(
                 let r: Ref = push_line.parse().unwrap();
                 
                 let mut git_repo = Repository::open_from_env().unwrap();
+
                 repo.push(&r.src, &r.dst, r.force, &mut git_repo, ipfs).unwrap();
 
                 debug!("repo:{:#?}", &repo);
