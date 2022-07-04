@@ -88,7 +88,7 @@ fn handle_list(
     // Consume the command line
     match line_buf.as_str() {
         list if list.starts_with("list") => {
-            // trace!("Consumed the \"list*\" command {}", list);
+            trace!("Consumed the \"list*\" command {}", list);
         }
         // Sometimes git needs to finish early, e.g. when the local ref doesn't even exist locally
         "\n" => {
@@ -108,11 +108,11 @@ fn handle_list(
         debug!("fetch from {}", output);
         writeln!(output_handle, "{}", output)?;
     }
-    output_handle.write_all(b"\n")?;
+    // output_handle.write_all(b"\n")?;
 
     // // Indicate that we're done listing
     // // writeln!(output_handle,"refs/heads/master HEAD")?;
-    // writeln!(output_handle)?;
+    writeln!(output_handle)?;
 
     
     Ok(())
