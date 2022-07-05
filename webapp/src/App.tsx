@@ -1,45 +1,74 @@
-import { useState } from 'react'
-import logo from './logo.svg'
-import './App.css'
-
+import { useEffect, useState } from 'react';
+import Web3 from 'web3';
+const ABI = [
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_greeting",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "inputs": [],
+    "name": "greet",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_greeting",
+        "type": "string"
+      }
+    ],
+    "name": "setGreeting",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+];
+const ADDRESS = '0x22fCB380773027B246b0EAfafC1f996938f2eF14';
 function App() {
-  const [count, setCount] = useState(0)
+  const [account, setAccount] = useState(); // state variable to set account.
+  const [call, setCall] = useState(); // state variable to set account.
+
+  useEffect(() => {
+    async function load() {
+      const web3 = new Web3(Web3.givenProvider || 'https://ropsten.infura.io/v3/3f433221d3db475db058b3875a617fdd');
+      const accounts = await web3.eth.requestAccounts();
+
+      setAccount(accounts[0]);
+
+
+      // Instantiate smart contract using ABI and address.
+      const contactList = new web3.eth.Contract(ABI, ADDRESS);
+      // await contactList.methods.setGreeting('hi').call();
+      const greet = await contactList.methods.greet().call();
+      console.log(greet);
+      setCall(greet);
+    }
+
+    load();
+  }, []);
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>Hello Vite + React!</p>
-        <p>
-          <button type="button" onClick={() => setCount((count) => count + 1)}>
-            count is: {count}
-          </button>
-        </p>
-        <p>
-          Edit <code>App.tsx</code> and save to test HMR updates.
-        </p>
-        <p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-          {' | '}
-          <a
-            className="App-link"
-            href="https://vitejs.dev/guide/features.html"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Vite Docs
-          </a>
-        </p>
-      </header>
+    <div>
+      Your account is: {account}
+      Call: {JSON.stringify(call)}
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
