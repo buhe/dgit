@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { AbiItem } from 'web3-utils'
 import Web3 from 'web3';
 const ABI = [
   {
@@ -41,7 +42,7 @@ const ABI = [
 ];
 const ADDRESS = '0x22fCB380773027B246b0EAfafC1f996938f2eF14';
 function App() {
-  const [account, setAccount] = useState(); // state variable to set account.
+  const [account, setAccount] = useState(''); // state variable to set account.
   const [call, setCall] = useState(); // state variable to set account.
 
   useEffect(() => {
@@ -53,7 +54,7 @@ function App() {
 
 
       // Instantiate smart contract using ABI and address.
-      const contactList = new web3.eth.Contract(ABI, ADDRESS);
+      const contactList = new web3.eth.Contract(ABI as AbiItem[], ADDRESS);
       // await contactList.methods.setGreeting('hi').call();
       const greet = await contactList.methods.greet().call();
       console.log(greet);
