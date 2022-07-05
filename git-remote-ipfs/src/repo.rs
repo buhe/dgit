@@ -1,12 +1,21 @@
 use std::str;
 use std::{collections::{BTreeMap, HashSet}, io::Cursor};
-use failure::Error;
+use failure::{Error, Fail};
 use futures::TryStreamExt;
 use git2::{Repository, ObjectType, Object, Oid, Odb};
 use ipfs_api_backend_hyper::{IpfsClient, IpfsApi};
 use log::{debug, error, trace, warn};
 
 use crate::object::{GitObject, ObjectMetadata};
+
+#[derive(Debug, Fail)]
+/// Errors related to the `index` module
+pub enum GitError {
+    /// There's objects in the index not present in the local repo - a pull is needed
+    #[fail(display = "fetch first")]
+    FetchFirst,
+}
+
 // serialize to json
 #[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub struct Repo {
@@ -129,7 +138,7 @@ impl Repo {
      pub fn push(&mut self,
         ref_src: &str,
         ref_dst: &str,
-        _force: bool,
+        force: bool,
         repo: &mut Repository,
         ipfs: &mut IpfsClient,
     ) -> Result<(), Error> {
@@ -147,6 +156,28 @@ impl Repo {
             obj.kind(),
             obj.id()
         );
+
+        if force {
+            warn!("This push will be forced");
+        } else {
+            debug!("Checking for work ahead of us...");
+
+            if let Some(dst_git_hash) = self.refs.get(ref_dst) {
+                let mut missing_objects = HashSet::new();
+                self.enumerate_for_fetch(dst_git_hash.parse()?, &mut missing_objects, repo)?;
+
+                if !missing_objects.is_empty() {
+                    error!(
+                        "There's {} objects in {} not present locally. Please fetch first or force-push.",
+                        missing_objects.len(),
+                        ref_dst
+                        );
+
+                    debug!("Missing objects:\n{:#?}", missing_objects);
+                    return Err(GitError::FetchFirst.into());
+                }
+            }
+        }
 
         let mut objs_for_push = HashSet::new();
         self.find_all_objects(&obj.clone(), &mut objs_for_push, repo)?;
