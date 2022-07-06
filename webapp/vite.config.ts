@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import path from "path"
+import * as path from "path"
 import { reactRouterPlugin } from 'vite-plugin-next-react-router'
 
 // https://vitejs.dev/config/
