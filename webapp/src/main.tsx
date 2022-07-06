@@ -1,10 +1,18 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import App from './App'
-import './index.css'
+import { BrowserRouter, useRoutes } from 'react-router-dom';
+import { routes } from './routes'; // or use Vite's alias to simplify import path for nested components
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
+function App() {
+  const element = useRoutes(routes);
+  return element;
+}
+
+const root = ReactDOM.createRoot(
+  document.getElementById("root")!
+);
+root.render(
+  <BrowserRouter>
     <App />
-  </React.StrictMode>
-)
+  </BrowserRouter>
+);
