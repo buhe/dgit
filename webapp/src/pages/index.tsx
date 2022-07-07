@@ -15,7 +15,7 @@ import { Route, Link, useParams } from 'react-router-dom';
 
 // export default component;
 
-import { AppstoreOutlined, MailOutlined, SettingOutlined } from '@ant-design/icons';
+import { SettingOutlined, CodeOutlined, BugOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Menu } from 'antd';
 import React, { useState } from 'react';
@@ -24,12 +24,12 @@ const items: MenuProps['items'] = [
     {
         label: 'Code',
         key: 'code',
-        icon: <MailOutlined />,
+        icon: <CodeOutlined />,
     },
     {
         label: (<Link to="/App">Issue</Link>),
         key: 'issue',
-        icon: <AppstoreOutlined />,
+        icon: <BugOutlined />,
     },
     {
         label: 'Setting',
