@@ -13,8 +13,7 @@
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-router-dom": "6",
-    "web3": "^1.7.4",
-    "web3uikit": "^0.1.166"
+    "web3": "^1.7.4"
   },
   "devDependencies": {
     "@types/react": "^18.0.0",
