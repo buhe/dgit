@@ -1,6 +1,8 @@
 import { useAccount, useConnect, useDisconnect } from 'wagmi'
 import { InjectedConnector } from 'wagmi/connectors/injected'
 
+import { Button } from 'antd';
+
 function Profile() {
     const { address } = useAccount()
     const { connect } = useConnect({
@@ -10,12 +12,11 @@ function Profile() {
 
     if (address)
         return (
-            <div>
-                Connected to {address}
-                <button onClick={() => disconnect()}>Disconnect</button>
+            <div style={{display: 'flex', justifyContent: 'end',paddingRight: 44, paddingTop: 12}}>
+                <Button onClick={() => disconnect()}>Disconnect</Button>
             </div>
         )
-    return <button onClick={() => connect()}>Connect Wallet</button>
+    return <Button onClick={() => connect()}>Connect Wallet</Button>
 }
 
 export default Profile;
