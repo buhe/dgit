@@ -1,6 +1,8 @@
 import React from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
+import { rust } from '@codemirror/lang-rust';
+
 import { useContractRead } from 'wagmi'
 const ABI = [
     {
@@ -58,8 +60,8 @@ function App() {
             <div>{data}</div>
             <CodeMirror
                 value="console.log('hello world!');"
-                height="200px"
-                extensions={[javascript({ jsx: true })]}
+                height="600px"
+                extensions={[javascript({ jsx: true }), rust()]}
                 onChange={onChange}
             />
         </div>
