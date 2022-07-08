@@ -16,7 +16,11 @@ function Profile() {
                 <Button onClick={() => disconnect()}>Disconnect</Button>
             </div>
         )
-    return <Button onClick={() => connect()}>Connect Wallet</Button>
+    return (
+        <div style={{ display: 'flex', justifyContent: 'end', paddingRight: 44, paddingTop: 12 }}>
+            <Button onClick={() => connect()}>Connect Wallet</Button>
+        </div>
+    )
 }
 
 export default Profile;
