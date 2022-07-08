@@ -57,8 +57,8 @@ function App() {
     // // const id = ipfs && await ipfs.id();
     // const [version, setVersion] = useState(null)
 
-    // useEffect(() => {
-    //     if (!ipfs) return;
+    useEffect(() => {
+        if (!ipfs) return;
 
     //     const getVersion = async () => {
     //         const nodeId = await ipfs.version();
@@ -66,7 +66,7 @@ function App() {
     //     }
 
     //     getVersion();
-    // }, [ipfs])
+    }, [ipfs])
 
     const onChange = React.useCallback((value: any, viewUpdate: any) => {
         console.log('value:', value);

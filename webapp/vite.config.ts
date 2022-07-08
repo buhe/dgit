@@ -6,7 +6,7 @@ import { reactRouterPlugin } from 'vite-plugin-next-react-router'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react(), reactRouterPlugin(),],
-  resolve: { alias: { web3: path.resolve(__dirname, './node_modules/web3/dist/web3.min.js')}, },
+  resolve: { alias: { web3: path.resolve(__dirname, './node_modules/web3/dist/web3.min.js'), cluster: ''}, },
   build: {
     target: 'esnext',
     minify: false
