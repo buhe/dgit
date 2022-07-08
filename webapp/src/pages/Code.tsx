@@ -4,7 +4,7 @@ import { javascript } from '@codemirror/lang-javascript';
 import { rust } from '@codemirror/lang-rust';
 
 import { useContractRead } from 'wagmi'
-// import useIpfsFactory from '../hooks/use-ipfs-factory';
+import useIpfsFactory from '../hooks/use-ipfs-factory';
 const ABI = [
     {
         "inputs": [
@@ -53,7 +53,7 @@ function App() {
         functionName: 'greet',
     })
 
-    // const { ipfs, ipfsInitError } = useIpfsFactory()
+    const { ipfs, ipfsInitError } = useIpfsFactory()
     // // const id = ipfs && await ipfs.id();
     // const [version, setVersion] = useState(null)
 
