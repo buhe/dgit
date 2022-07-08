@@ -22,7 +22,7 @@ import React, { useState } from 'react';
 
 const items: MenuProps['items'] = [
     {
-        label: 'Code',
+        label: (<Link to="/Code">Code</Link>),
         key: 'code',
         icon: <CodeOutlined />,
     },

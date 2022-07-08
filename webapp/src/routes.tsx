@@ -4,6 +4,7 @@ import GlobalLayout from './pages/_layout'
 
 const DynamicIndex = React.lazy(() => import('./pages/index'));
 const DynamicApp = React.lazy(() => import('./pages/App'));
+const DynamicCode = React.lazy(() => import('./pages/Code'));
 
 
 export const routes = [
@@ -13,6 +14,7 @@ export const routes = [
     children: [
       { path: '/', element: <DynamicIndex />, index: true},
       { path: '/App', element: <DynamicApp />, },
+      { path: '/Code', element: <DynamicCode />, },
     ]
   }
 ]
@@ -20,4 +22,5 @@ export const routes = [
 export const pages = [
   { route: '/' },
   { route: '/App' },
+  { route: '/Code' },
 ]
