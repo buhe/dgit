@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { rust } from '@codemirror/lang-rust';
 
 import { useContractRead } from 'wagmi'
+import useIpfsFactory from '../hooks/use-ipfs-factory';
 const ABI = [
     {
         "inputs": [
@@ -52,12 +53,27 @@ function App() {
         functionName: 'greet',
     })
 
+    const { ipfs, ipfsInitError } = useIpfsFactory()
+    // const id = ipfs && await ipfs.id();
+    const [version, setVersion] = useState(null)
+
+    useEffect(() => {
+        if (!ipfs) return;
+
+        const getVersion = async () => {
+            const nodeId = await ipfs.version();
+            setVersion(nodeId as any);
+        }
+
+        getVersion();
+    }, [ipfs])
+
     const onChange = React.useCallback((value: any, viewUpdate: any) => {
         console.log('value:', value);
     }, []);
     return (
         <div>
-            <div>{data}</div>
+            <div>{JSON.stringify(version)}</div>
             <CodeMirror
                 value="console.log('hello world!');"
                 height="600px"
