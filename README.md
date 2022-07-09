@@ -20,3 +20,5 @@ Greeter deployed to: 0x22fCB380773027B246b0EAfafC1f996938f2eF14
 - Auther: Nomic Foundation
 - VS Marketplace: https://marketplace.visualstudio.com/items?itemName=NomicFoundation.hardhat-solidity
 
+### Reference
+- https://github.com/drozdziak1/nip
