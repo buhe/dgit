@@ -7,7 +7,7 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 
 # This program built for i386-apple-darwin11.3.0
 
-# Make data base, printed on Fri Jul  8 14:38:34 2022
+# Make data base, printed on Sat Jul  9 12:01:21 2022
 
 # Variables
 
@@ -32,9 +32,12 @@ CURDIR := /Users/buhe/code/gitHub/dgit
 # makefile
 SHELL = /bin/sh
 # environment
-VSCODE_NLS_CONFIG = {"locale":"zh-cn","availableLanguages":{"*":"zh-cn"},"_languagePackId":"bbca1a7059cee8a1b93da8947fee1c4f.zh-cn","_translationsConfigFile":"/Users/buhe/Library/Application Support/Code/clp/bbca1a7059cee8a1b93da8947fee1c4f.zh-cn/tcf.json","_cacheRoot":"/Users/buhe/Library/Application Support/Code/clp/bbca1a7059cee8a1b93da8947fee1c4f.zh-cn","_resolvedLanguagePackCoreLocation":"/Users/buhe/Library/Application Support/Code/clp/bbca1a7059cee8a1b93da8947fee1c4f.zh-cn/92d25e35d9bf1a6b16f7d0758f25d48ace11e5b9","_corruptedFile":"/Users/buhe/Library/Application Support/Code/clp/bbca1a7059cee8a1b93da8947fee1c4f.zh-cn/corrupted.info","_languagePackSupport":true}
+VSCODE_NLS_CONFIG = {"locale":"zh-cn","availableLanguages":{"*":"zh-cn"},"_languagePackId":"c9280508cf500dcd9c4c87fe2a1b08e9.zh-cn","_translationsConfigFile":"/Users/buhe/Library/Application Support/Code/clp/c9280508cf500dcd9c4c87fe2a1b08e9.zh-cn/tcf.json","_cacheRoot":"/Users/buhe/Library/Application Support/Code/clp/c9280508cf500dcd9c4c87fe2a1b08e9.zh-cn","_resolvedLanguagePackCoreLocation":"/Users/buhe/Library/Application Support/Code/clp/c9280508cf500dcd9c4c87fe2a1b08e9.zh-cn/92d25e35d9bf1a6b16f7d0758f25d48ace11e5b9","_corruptedFile":"/Users/buhe/Library/Application Support/Code/clp/c9280508cf500dcd9c4c87fe2a1b08e9.zh-cn/corrupted.info","_languagePackSupport":true}
 # environment
 _ = /usr/bin/make
+ 
+make: *** No rule to make target `all'.  Stop.
+
 # makefile
 MAKEFILE_LIST := 
 # environment
@@ -44,7 +47,7 @@ WASMER_DIR = /Users/buhe/.wasmer
 # environment
 VSCODE_CWD = /
 # environment
-PATH = /Users/buhe/.espressif/tools/xtensa-esp32-elf-clang/esp-13.0.0-20211203-x86_64-apple-darwin/bin/:/Users/buhe/.wasmtime/bin:/Users/buhe/.wasmer/bin:/Users/buhe/code/gitHub/bugu-lang/riscv-gcc/bin:/Users/buhe/.jabba/jdk/openjdk@1.16.0/Contents/Home/bin:/Applications:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/devkitpro/tools/bin:/Library/Apple/usr/bin:/Users/buhe/.cargo/bin:/Users/buhe/.wasmer/globals/wapm_packages/.bin
+PATH = /Users/buhe/.nvm/versions/node/v16.16.0/bin:/Users/buhe/.espressif/tools/xtensa-esp32-elf-clang/esp-13.0.0-20211203-x86_64-apple-darwin/bin/:/Users/buhe/.wasmtime/bin:/Users/buhe/.wasmer/bin:/Users/buhe/code/gitHub/bugu-lang/riscv-gcc/bin:/Users/buhe/.jabba/jdk/openjdk@1.16.0/Contents/Home/bin:/Applications:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/devkitpro/tools/bin:/Library/Apple/usr/bin:/Users/buhe/.cargo/bin:/Users/buhe/.wasmer/globals/wapm_packages/.bin
 # environment
 LSCOLORS = Gxfxcxdxbxegedabagacad
 # environment
@@ -53,6 +56,8 @@ GOLANG_EXECUTABLE = go
 THREE_SCALE_USER_TOKEN = 207c527cfc2a6b8dcf4fa43ad7a976da
 # default
 .INCLUDE_DIRS = /usr/local/include
+# environment
+NVM_BIN = /Users/buhe/.nvm/versions/node/v16.16.0/bin
 # environment
 ELECTRON_RUN_AS_NODE = 1
 # default
@@ -76,11 +81,13 @@ MAKEFILEPATH := /Applications/Xcode.app/Contents/Developer/Makefiles
 # environment
 VSCODE_CODE_CACHE_PATH = /Users/buhe/Library/Application Support/Code/CachedData/92d25e35d9bf1a6b16f7d0758f25d48ace11e5b9
 # environment
+WASMTIME_HOME = /Users/buhe/.wasmtime
+# environment
 LOGNAME = buhe
 # environment
 APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = 1
 # environment
-WASMTIME_HOME = /Users/buhe/.wasmtime
+NVM_CD_FLAGS = -q
 # environment
 TELEMETRY_ID = 0230e0e7-4ee8-4bbf-9069-f3440aa04ab6
 # environment
@@ -140,6 +147,8 @@ MFLAGS = -Rrqp
 # automatic
 *D = $(patsubst %/,%,$(dir $*))
 # environment
+NVM_DIR = /Users/buhe/.nvm
+# environment
 XPC_SERVICE_NAME = application.com.microsoft.VSCode.76145158.76145164
 # automatic
 +D = $(patsubst %/,%,$(dir $+))
@@ -170,11 +179,11 @@ MAKELEVEL := 0
 # environment
 LANG = C
 # environment
-VSCODE_PID = 99630
+VSCODE_PID = 46848
 # environment
 JAVA_HOME_BEFORE_JABBA = 
 # variable set hash-table stats:
-# Load=81/1024=8%, Rehash=0, Collisions=4/102=4%
+# Load=84/1024=8%, Rehash=0, Collisions=5/105=5%
 
 # Pattern-specific Variable Values
 
@@ -182,9 +191,9 @@ JAVA_HOME_BEFORE_JABBA =
 
 # Directories
 
-# . (device 16777221, inode 73449775): 13 files, no impossibilities.
+# . (device 16777221, inode 73449775): 14 files, no impossibilities.
 
-# 13 files, no impossibilities in 1 directories.
+# 14 files, no impossibilities in 1 directories.
 
 # Implicit Rules
 
@@ -256,8 +265,6 @@ GNUmakefile:
 # strcache size: total = 0 / max = 0 / min = 4096 / avg = 0
 # strcache free: total = 0 / max = 0 / min = 4096 / avg = 0
 
-# Finished Make data base on Fri Jul  8 14:38:34 2022
+# Finished Make data base on Sat Jul  9 12:01:21 2022
 
  
-make: *** No rule to make target `all'.  Stop.
-

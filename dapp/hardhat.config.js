@@ -36,8 +36,18 @@ module.exports = {
       accounts: [`0x${ROPSTEN_PRIVATE_KEY}`]
     }
   },
-  abiExporter: {
-    path: '../git-remote-ipfs/src/abi',
-    runOnCompile: true,
-  }
+  abiExporter: [
+    {
+      path: '../dgit-cli/src/abi',
+      runOnCompile: true,
+    },
+    {
+      path: '../git-remote-ipfs/src/abi',
+      runOnCompile: true,
+    },
+    {
+      path: '../webapp2/abi',
+      runOnCompile: true,
+    }
+  ]
 };
