@@ -29,7 +29,7 @@ function Connect() {
                     ))}
             </div>
 
-            {error && <div>{error.message}</div>}
+            {/* {error && <div>{error.message}</div>} */}
         </div>
     )
 }
