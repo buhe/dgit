@@ -23,6 +23,8 @@ enum Commands {
 struct Issue {
     #[clap(value_parser)]
     title: Option<String>,
+    #[clap(value_parser)]
+    content: Option<String>,
 }
 
 #[tokio::main]
@@ -30,11 +32,9 @@ async fn main() -> Result<(), Error>{
     println!("Hello, world!");
     let cli = Cli::parse();
 
-    // You can check for the existence of subcommands, and if found use their
-    // matches just as you would the top level cmd
     match &cli.command {
         Commands::Issue(issue) => {
-            println!("'myapp add' was used, name is: {:?}", issue.title)
+            println!("'issue' was used, name is: {:?}", issue.title)
         }
     }
     Ok(())
