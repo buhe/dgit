@@ -63,18 +63,20 @@ function App() {
         const getVersion = async () => {
             const nodeId = await ipfs.version();
             setVersion(nodeId as any);
+            console.info(data);
+            console.info(nodeId);
         }
 
         getVersion();
-    }, [ipfs])
+    }, [data, ipfs])
 
     const onChange = React.useCallback((value: any, viewUpdate: any) => {
         console.log('value:', value);
     }, []);
     return (
         <Layout title="Home | Next.js + TypeScript Example">
-            <div>{JSON.stringify(version)}</div>
-            <div>{data}</div>
+            {/* <div>{JSON.stringify(version)}</div> */}
+            {/* <div>{data}</div> */}
             <CodeMirror
                 value="console.log('hello world!');"
                 height="600px"

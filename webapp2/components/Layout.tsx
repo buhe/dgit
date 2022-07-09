@@ -59,9 +59,9 @@ const Layout = ({ children, title = 'This is the default title' }: Props) => {
                 <Breadcrumb.Item>test-repo</Breadcrumb.Item>
             </Breadcrumb>
             <Menu onClick={onClick} selectedKeys={[current]} mode="horizontal" items={items} />
-            <Suspense fallback={'loading...'}>
+            {/* <Suspense fallback={'loading...'}> */}
                 {children}
-            </Suspense>
+            {/* </Suspense> */}
             {/* <Footer /> */}
         </div>
     );
