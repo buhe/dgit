@@ -10,7 +10,7 @@ import type { MenuProps } from 'antd';
 import { Menu } from 'antd';
 
 // import Footer from '../components/Footer';
-// import Header from '../components/Header';
+import Header from './Header';
 const items: MenuProps['items'] = [
     {
         label: (<Link href="/Code">Code</Link>),
@@ -51,7 +51,7 @@ const Layout = ({ children, title = 'This is the default title' }: Props) => {
 
     return (
         <div>
-            {/* <Header /> */}
+            <Header />
             <Breadcrumb style={{
                 paddingLeft: 20, paddingBottom: 12,paddingTop: 12
             }}>
