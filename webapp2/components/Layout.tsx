@@ -1,6 +1,5 @@
 import React, { ReactNode } from 'react'
 import Link from 'next/link'
-import Head from 'next/head'
 import { Suspense, useState } from 'react';
 // import { Outlet } from 'react-router-dom';
 
@@ -14,7 +13,7 @@ import { Menu } from 'antd';
 // import Header from '../components/Header';
 const items: MenuProps['items'] = [
     {
-        label: 'Code',
+        label: (<Link href="/Code">Code</Link>),
         // label: (<Link to="/Code">Code</Link>),
         key: 'code',
         icon: <CodeOutlined />,
@@ -62,7 +61,6 @@ const Layout = ({ children, title = 'This is the default title' }: Props) => {
             <Menu onClick={onClick} selectedKeys={[current]} mode="horizontal" items={items} />
             <Suspense fallback={'loading...'}>
                 {children}
-                {/* <Outlet /> */}
             </Suspense>
             {/* <Footer /> */}
         </div>
