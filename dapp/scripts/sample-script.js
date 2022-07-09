@@ -19,7 +19,7 @@ async function main() {
 
   await greeter.deployed();
 
-  console.log("Greeter deployed to:", greeter.address);
+  console.log("Greeter deployed to:", greeter.address); // todo: write json file
   await greeter.setGreeting('hi bugu');
   console.log("call:", await greeter.greet());
 
