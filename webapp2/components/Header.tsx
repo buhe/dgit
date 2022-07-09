@@ -1,26 +1,37 @@
 import { useAccount, useConnect, useDisconnect } from 'wagmi'
-import { InjectedConnector } from 'wagmi/connectors/injected'
 
-import { Button } from 'antd';
+import { useIsMounted } from '../hooks/useIsMounted'
+import { Button } from 'antd'
 
-function Profile() {
-    const { address } = useAccount()
-    const { connect } = useConnect({
-        connector: new InjectedConnector(),
-    })
+function Connect() {
+    const isMounted = useIsMounted()
+    const { connector, isConnected } = useAccount()
+    const { connect, connectors, error, isLoading, pendingConnector } =
+        useConnect()
     const { disconnect } = useDisconnect()
 
-    if (address)
-        return (
-            <div style={{display: 'flex', justifyContent: 'end',paddingRight: 44, paddingTop: 12}}>
-                <Button onClick={() => disconnect()}>Disconnect</Button>
-            </div>
-        )
     return (
         <div style={{ display: 'flex', justifyContent: 'end', paddingRight: 44, paddingTop: 12 }}>
-            <Button onClick={() => connect()}>Connect Wallet</Button>
+            <div>
+                {isConnected && (
+                    <Button onClick={() => disconnect()}>
+                        Disconnect from {connector?.name}
+                    </Button>
+                )}
+
+                {connectors
+                    .filter((x) => isMounted && x.ready && x.id !== connector?.id)
+                    .map((x) => (
+                        <Button key={x.id} onClick={() => connect({ connector: x })}>
+                            {x.name}
+                            {isLoading && x.id === pendingConnector?.id && ' (connecting)'}
+                        </Button>
+                    ))}
+            </div>
+
+            {error && <div>{error.message}</div>}
         </div>
     )
 }
 
-export default Profile;
+export default Connect;

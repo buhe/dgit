@@ -11,7 +11,7 @@ import { MetaMaskConnector } from 'wagmi/connectors/metaMask'
 import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
 
 const infuraId = '3f433221d3db475db058b3875a617fdd'
-const { chains, provider } = configureChains(
+const { chains, provider, webSocketProvider } = configureChains(
   [chain.ropsten],
   [infuraProvider({ infuraId })],
 )
@@ -40,6 +40,7 @@ const client = createClient({
     }),
   ],
   provider,
+  webSocketProvider,
 })
 
 function MyApp({ Component, pageProps }: AppProps) {
