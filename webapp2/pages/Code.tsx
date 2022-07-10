@@ -67,7 +67,7 @@ function App() {
 
     const { ipfs, ipfsInitError } = useIpfsFactory()
     // // const id = ipfs && await ipfs.id();
-    const [code, setCode] = useState(null)
+    const [code, setCode] = useState("console.log('hello world!');")
 
     useEffect(() => {
         if (!ipfs) return;
@@ -87,6 +87,7 @@ function App() {
             console.info(cid);
             const json = await readFile(ipfs, cid);
             console.info('json '+json);
+            setCode(json);
         }
 
         getVersion();
@@ -100,7 +101,7 @@ function App() {
             {/* <div>{JSON.stringify(version)}</div> */}
             {/* <div>{data}</div> */}
             <CodeMirror
-                value="console.log('hello world!');"
+                value={code}
                 height="600px"
                 extensions={[javascript({ jsx: true }), rust()]}
                 onChange={onChange}
