@@ -4,7 +4,6 @@ use env_logger::Builder;
 use failure::Error;
 
 mod issue;
-mod meta;
 
 use clap::{Args, Parser, Subcommand};
 use ipfs_api_backend_hyper::{IpfsClient, IpfsApi};
@@ -33,7 +32,7 @@ struct Issue {
 }
 
 #[tokio::main]
-async fn main() -> Result<(), Error>{
+async fn main() -> Result<(), Error> {
     // println!("Hello, world!");
     init_logging(LevelFilter::Trace);
     let cli = Cli::parse();

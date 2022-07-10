@@ -5,8 +5,7 @@ import "hardhat/console.sol";
 
 contract Greeter {
     string private greeting;
-    string private issues;
-
+    string private issues; // a array of issues
     constructor() {
     }
 
