@@ -54,7 +54,7 @@ function App() {
         contractInterface: ABI,
         functionName: 'greet',
     })
-    const KEY = 'QmW1fpwjve61tDSDni96FaMvFqNDPc43eusabahk1qdkxN'
+    const KEY = 'QmWfVY9y3xjsixTgbd9AorQxH7VtMpzfx2HaWtsoUYecaX'
     const readFile = async (ipfs: IPFS, cid: CID): Promise<string> => {
         const decoder = new TextDecoder()
         let content = ''
