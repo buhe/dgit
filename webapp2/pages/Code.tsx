@@ -77,12 +77,12 @@ function App() {
             // setVersion(nodeId as any);
             console.info(data);
             console.info(nodeId);
-            // const file = await ipfs.add({
-            //     path: 'hello.txt',
-            //     content: new TextEncoder().encode('Hello World bugu ipfs....')
-            // })
+            const file = await ipfs.add({
+                path: 'hello.txt',
+                content: new TextEncoder().encode('Hello World bugu ipfs....')
+            })
 
-            // console.log('Added file:', file.path, file.cid.toString())
+            console.log('Added file:', file.path, file.cid.toString())
             const cid = CID.parse(KEY);
             console.info('cid '+cid);
             const json = await readFile(ipfs, cid);
