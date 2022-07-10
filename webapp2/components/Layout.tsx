@@ -1,36 +1,30 @@
 import React, { ReactNode } from 'react'
 import Link from 'next/link'
-import { Suspense, useState } from 'react';
-// import { Outlet } from 'react-router-dom';
-
+import { useRouter } from 'next/router'
 import { Breadcrumb } from 'antd';
-// import { Route, Link, useParams } from 'react-router-dom';
 import { SettingOutlined, CodeOutlined, BugOutlined, TagOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Menu } from 'antd';
-
-// import Footer from '../components/Footer';
 import Header from './Header';
 const items: MenuProps['items'] = [
     {
         label: (<Link href="/Code">Code</Link>),
-        // label: (<Link to="/Code">Code</Link>),
-        key: 'code',
+        key: '/Code',
         icon: <CodeOutlined />,
     },
     {
-        label: 'Issue',
-        key: 'issue',
+        label: (<Link href="/Issue">Issue</Link>),
+        key: '/Issue',
         icon: <BugOutlined />,
     },
     {
         label: 'NFT',
-        key: 'nft',
+        key: '/NFT',
         icon: <TagOutlined />,
     },
     {
         label: 'Setting',
-        key: 'setting',
+        key: '/Setting',
         icon: <SettingOutlined />,
     },
 ];
@@ -42,12 +36,8 @@ type Props = {
 }
 
 const Layout = ({ children, title = 'This is the default title' }: Props) => {
-    const [current, setCurrent] = useState('code');
-
-    const onClick: MenuProps['onClick'] = e => {
-        console.log('click ', e);
-        setCurrent(e.key);
-    };
+    const router = useRouter()
+    console.debug('Current router is ' + JSON.stringify(router))
 
     return (
         <div>
@@ -58,11 +48,8 @@ const Layout = ({ children, title = 'This is the default title' }: Props) => {
                 <Breadcrumb.Item>buhe</Breadcrumb.Item>
                 <Breadcrumb.Item>test-repo</Breadcrumb.Item>
             </Breadcrumb>
-            <Menu onClick={onClick} selectedKeys={[current]} mode="horizontal" items={items} />
-            {/* <Suspense fallback={'loading...'}> */}
+            <Menu selectedKeys={[router.pathname]} mode="horizontal" items={items} />
                 {children}
-            {/* </Suspense> */}
-            {/* <Footer /> */}
         </div>
     );
 };
