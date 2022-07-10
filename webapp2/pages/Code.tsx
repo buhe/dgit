@@ -84,7 +84,7 @@ function App() {
 
             // console.log('Added file:', file.path, file.cid.toString())
             const cid = CID.parse(KEY);
-            console.info(cid);
+            console.info('cid '+cid);
             const json = await readFile(ipfs, cid);
             console.info('json '+json);
             setCode(json);
