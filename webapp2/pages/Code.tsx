@@ -5,6 +5,8 @@ import { rust } from '@codemirror/lang-rust';
 import Layout from '../components/Layout'
 import { useContractRead } from 'wagmi'
 import useIpfsFactory from '../hooks/use-ipfs-factory';
+import { IPFS } from 'ipfs-core'
+import { CID } from 'multiformats/cid'
 const ABI = [
     {
         "inputs": [
@@ -52,19 +54,39 @@ function App() {
         contractInterface: ABI,
         functionName: 'greet',
     })
+    const KEY = 'QmW1fpwjve61tDSDni96FaMvFqNDPc43eusabahk1qdkxN'
+    const readFile = async (ipfs: IPFS, cid: CID): Promise<string> => {
+        const decoder = new TextDecoder()
+        let content = ''
+        for await (const chunk of ipfs.cat(cid)) {
+            content += decoder.decode(chunk)
+        }
+
+        return content
+    }
 
     const { ipfs, ipfsInitError } = useIpfsFactory()
     // // const id = ipfs && await ipfs.id();
-    const [version, setVersion] = useState(null)
+    const [code, setCode] = useState(null)
 
     useEffect(() => {
         if (!ipfs) return;
 
         const getVersion = async () => {
             const nodeId = await ipfs.version();
-            setVersion(nodeId as any);
+            // setVersion(nodeId as any);
             console.info(data);
             console.info(nodeId);
+            // const file = await ipfs.add({
+            //     path: 'hello.txt',
+            //     content: new TextEncoder().encode('Hello World bugu ipfs....')
+            // })
+
+            // console.log('Added file:', file.path, file.cid.toString())
+            const cid = CID.parse(KEY);
+            console.info(cid);
+            const json = await readFile(ipfs, cid);
+            console.info('json '+json);
         }
 
         getVersion();
