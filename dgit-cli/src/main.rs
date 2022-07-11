@@ -1,4 +1,4 @@
-use std::{io::Cursor, env};
+use std::{env};
 
 use env_logger::Builder;
 use failure::Error;
@@ -6,8 +6,8 @@ use failure::Error;
 mod issue;
 
 use clap::{Args, Parser, Subcommand};
-use ipfs_api_backend_hyper::{IpfsClient, IpfsApi};
-use log::{LevelFilter, debug, trace};
+use issue::Issue;
+use log::{LevelFilter};
 
 #[derive(Parser)]
 #[clap(author, version, about, long_about = None)]
@@ -20,11 +20,11 @@ struct Cli {
 #[derive(Subcommand)]
 enum Commands {
     /// Issue management
-    Issue(Issue),
+    Issue(IssueArg),
 }
 
 #[derive(Args)]
-struct Issue {
+struct IssueArg {
     #[clap(value_parser)]
     title: Option<String>,
     #[clap(value_parser)]
@@ -38,12 +38,14 @@ async fn main() -> Result<(), Error> {
     let cli = Cli::parse();
 
     match &cli.command {
-        Commands::Issue(issue) => {
-            trace!("'issue' was used, name is: {:?}", issue.title);
-            let ipfs = IpfsClient::default();
-            let raw_data_req = ipfs.add(Cursor::new(issue.title.clone().unwrap()));
-            let ipfs_hash = futures::executor::block_on(raw_data_req)?.hash;
-            debug!("hash {}", ipfs_hash);
+        Commands::Issue(arg) => {
+            // trace!("'issue' was used, name is: {:?}", issue.title);
+            // let ipfs = IpfsClient::default();
+            // let raw_data_req = ipfs.add(Cursor::new(issue.title.clone().unwrap()));
+            // let ipfs_hash = futures::executor::block_on(raw_data_req)?.hash;
+            // debug!("hash {}", ipfs_hash);
+            let issue = Issue{title: arg.title.clone().unwrap(), content: arg.content.clone().unwrap(), comments_hash: vec![]};
+            issue.add().await?;
         }
     }
     Ok(())
