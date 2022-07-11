@@ -4,10 +4,13 @@ use env_logger::Builder;
 use failure::Error;
 
 mod issue;
+mod address;
 
 use clap::{Args, Parser, Subcommand};
 use issue::Issue;
-use log::{LevelFilter};
+use log::{LevelFilter, debug};
+
+use crate::address::ADDRESS;
 
 #[derive(Parser)]
 #[clap(author, version, about, long_about = None)]
@@ -35,6 +38,7 @@ struct IssueArg {
 async fn main() -> Result<(), Error> {
     // println!("Hello, world!");
     init_logging(LevelFilter::Trace);
+    debug!("address is {}", ADDRESS);
     let cli = Cli::parse();
 
     match &cli.command {

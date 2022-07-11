@@ -4,6 +4,8 @@
 // When running the script with `npx hardhat run <script>` you'll find the Hardhat
 // Runtime Environment's members available in the global scope.
 const hre = require("hardhat");
+const fs = require('fs');
+const fsPromises = fs.promises;
 
 async function main() {
   // Hardhat always runs the compile task when running scripts with its command
@@ -20,12 +22,26 @@ async function main() {
   await greeter.deployed();
 
   console.log("Greeter deployed to:", greeter.address); // todo: write json file
+  await writeRust(greeter.address, ['../dgit-cli/src/address.rs', '../git-remote-ipfs/src/address.rs']);
+  await writeTypeScript(greeter.address, ['./ts']);
   await greeter.setGreeting('hi bugu');
   console.log("call:", await greeter.greet());
 
   await greeter.addString('issue 1 hash');
   console.log("call:", await greeter.getStrings());
   console.log("call:", await greeter.getLength());
+}
+
+async function writeRust(address, files) {
+  console.log('write ' + address + " to " + files);
+  for(file of files) {
+    await fsPromises.writeFile(file, 'pub const ADDRESS: &str = "' + address + '";\n');
+  }
+
+}
+
+async function writeTypeScript(address, files) {
+
 }
 
 // We recommend this pattern to be able to use async/await everywhere
