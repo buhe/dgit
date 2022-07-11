@@ -5,28 +5,19 @@ import "hardhat/console.sol";
 
 contract Greeter {
     string private greeting;
-    // Declaring state variable  
-    int[] private arr; 
-        
-    // Function to add data 
-    // in dynamic array
-    function addData(int num) public
-    {
-        arr.push(num);
+    string [] private strings;
+
+    function addString (string memory str) public {
+        strings.push (str);
     }
-        
-    // Function to get data of
-    // dynamic array
-    function getData() public view returns(int[] memory)
-    {
-        return arr;
+
+    function getStrings () public view returns (string [] memory) {
+        return strings;
     }
-        
-    // Function to return length 
-    // of dynamic array
+
     function getLength() public view returns (uint)
     {
-        return arr.length;
+        return strings.length;
     }
 
     function greet() public view returns (string memory) {

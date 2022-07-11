@@ -23,8 +23,8 @@ async function main() {
   await greeter.setGreeting('hi bugu');
   console.log("call:", await greeter.greet());
 
-  await greeter.addData(9);
-  console.log("call:", await greeter.getData());
+  await greeter.addString('issue 1 hash');
+  console.log("call:", await greeter.getStrings());
   console.log("call:", await greeter.getLength());
 }
 
