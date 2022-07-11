@@ -7,6 +7,7 @@ import { useContractRead } from 'wagmi'
 import useIpfsFactory from '../hooks/use-ipfs-factory';
 import { IPFS } from 'ipfs-core'
 import { CID } from 'multiformats/cid'
+import { ADDRESS } from '../address';
 const ABI = [
     {
         "inputs": [
@@ -46,11 +47,12 @@ const ABI = [
         "type": "function"
     }
 ];
-const ADDRESS = '0x22fCB380773027B246b0EAfafC1f996938f2eF14';
+const ADDRESSOLD = '0x22fCB380773027B246b0EAfafC1f996938f2eF14';
 
 function App() {
+    console.log('address is ' + ADDRESS)
     const { data, isError, isLoading } = useContractRead({
-        addressOrName: ADDRESS,
+        addressOrName: ADDRESSOLD,
         contractInterface: ABI,
         functionName: 'greet',
     })

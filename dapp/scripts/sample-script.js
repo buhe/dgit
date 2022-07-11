@@ -23,7 +23,7 @@ async function main() {
 
   console.log("Greeter deployed to:", greeter.address); // todo: write json file
   await writeRust(greeter.address, ['../dgit-cli/src/address.rs', '../git-remote-ipfs/src/address.rs']);
-  await writeTypeScript(greeter.address, ['./ts']);
+  await writeTypeScript(greeter.address, ['../webapp2/address.ts']);
   await greeter.setGreeting('hi bugu');
   console.log("call:", await greeter.greet());
 
@@ -33,15 +33,17 @@ async function main() {
 }
 
 async function writeRust(address, files) {
-  console.log('write ' + address + " to " + files);
+  console.log('write ' + address + " to rust " + files);
   for(file of files) {
     await fsPromises.writeFile(file, 'pub const ADDRESS: &str = "' + address + '";\n');
   }
-
 }
 
 async function writeTypeScript(address, files) {
-
+  console.log('write ' + address + " to typescriprt " + files);
+  for (file of files) {
+    await fsPromises.writeFile(file, 'export const ADDRESS = "' + address + '";\n');
+  }
 }
 
 // We recommend this pattern to be able to use async/await everywhere
