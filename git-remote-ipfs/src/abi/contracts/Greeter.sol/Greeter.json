@@ -1,17 +1,25 @@
 [
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "int256",
+        "name": "num",
+        "type": "int256"
+      }
+    ],
+    "name": "addData",
+    "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "constructor"
+    "type": "function"
   },
   {
     "inputs": [],
-    "name": "greet",
+    "name": "getData",
     "outputs": [
       {
-        "internalType": "string",
+        "internalType": "int256[]",
         "name": "",
-        "type": "string"
+        "type": "int256[]"
       }
     ],
     "stateMutability": "view",
@@ -19,7 +27,20 @@
   },
   {
     "inputs": [],
-    "name": "issue",
+    "name": "getLength",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "greet",
     "outputs": [
       {
         "internalType": "string",
@@ -39,19 +60,6 @@
       }
     ],
     "name": "setGreeting",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "_greeting",
-        "type": "string"
-      }
-    ],
-    "name": "setIssueing",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

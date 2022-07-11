@@ -23,8 +23,9 @@ async function main() {
   await greeter.setGreeting('hi bugu');
   console.log("call:", await greeter.greet());
 
-  await greeter.setIssueing('hi issue');
-  console.log("call:", await greeter.issue());
+  await greeter.addData(9);
+  console.log("call:", await greeter.getData());
+  console.log("call:", await greeter.getLength());
 }
 
 // We recommend this pattern to be able to use async/await everywhere

@@ -5,8 +5,28 @@ import "hardhat/console.sol";
 
 contract Greeter {
     string private greeting;
-    string private issues; // a array of issues
-    constructor() {
+    // Declaring state variable  
+    int[] private arr; 
+        
+    // Function to add data 
+    // in dynamic array
+    function addData(int num) public
+    {
+        arr.push(num);
+    }
+        
+    // Function to get data of
+    // dynamic array
+    function getData() public view returns(int[] memory)
+    {
+        return arr;
+    }
+        
+    // Function to return length 
+    // of dynamic array
+    function getLength() public view returns (uint)
+    {
+        return arr.length;
     }
 
     function greet() public view returns (string memory) {
@@ -18,12 +38,4 @@ contract Greeter {
         greeting = _greeting;
     }
 
-    function issue() public view returns (string memory) {
-        return issues;
-    }
-
-    function setIssueing(string memory _greeting) public {
-        console.log("Changing greeting from '%s' to '%s'", greeting, _greeting);
-        issues = _greeting;
-    }
 }
